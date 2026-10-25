@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>✨ SSC '27 GPA — Glass Calculator</title>
+  <style>
+    /* ---------- GLOBAL GLASS & ADVANCED UI ---------- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    :root {
+      --glass-bg: rgba(20, 28, 58, 0.55);
+      --glass-border: rgba(255, 255, 255, 0.12);
+      --glass-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+      --blur-amt: 18px;
+      --text-primary: #f0f4ff;
+      --text-muted: #a8b5e0;
+      --accent-gold: #ffbe3c;
+      --accent-blue: #6b9eff;
+      --accent-green: #5fe08b;
+      --accent-red: #ff7b7b;
+      --accent-orange: #ffa96b;
+    }
+
+    body {
+      background: radial-gradient(circle at 20% 0%, #1d2c5c, #0a0f22 70%);
+      min-height: 100vh;
+      padding: 2rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-primary);
+      backdrop-filter: blur(2px);
+    }
+
+    /* floating orbs for depth */
+    body::before,
+    body::after {
+      content: '';
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(100px);
+      opacity: 0.4;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    body::before {
+      width: 600px;
+      height: 600px;
+      background: #2f4fa8;
+      top: -20%;
+      right: -10%;
+    }
+
+    body::after {
+      width: 500px;
+      height: 500px;
+      background: #c76e00;
+      bottom: -20%;
+      left: -10%;
+      opacity: 0.25;
+    }
+
+    .wrap {
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /* ---------- HEADER ---------- */
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .badge {
+      display: inline-block;
+      background: rgba(255, 190, 60, 0.15);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 190, 60, 0.4);
+      color: #ffd98a;
+      font-weight: 700;
+      padding: 0.45rem 1.5rem;
+      border-radius: 40px;
+      font-size: 0.85rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      box-shadow: 0 0 20px rgba(255, 190, 60, 0.15);
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 6vw, 3.8rem);
+      font-weight: 800;
+      line-height: 1.2;
+      letter-spacing: -1px;
+      text-shadow: 0 2px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    h1 span {
+      background: linear-gradient(100deg, #b8d0ff, #ffbe3c);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .sub {
+      color: var(--text-muted);
+      font-size: 1rem;
+      margin-top: 0.6rem;
+      font-weight: 400;
+      letter-spacing: 0.2px;
+    }
+
+    /* ---------- GLASS CARDS GRID ---------- */
+    .grid {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 1.75rem;
+      align-items: start;
+    }
+
+    @media (max-width: 900px) {
+      .grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+    }
+
+    /* ---------- GLASS CARD BASE ---------- */
+    .glass {
+      background: var(--glass-bg);
+      backdrop-filter: blur(var(--blur-amt)) saturate(140%);
+      -webkit-backdrop-filter: blur(var(--blur-amt)) saturate(140%);
+      border: 1px solid var(--glass-border);
+      border-radius: 2rem;
+      box-shadow: var(--glass-shadow);
+      padding: 2rem 1.8rem;
+      transition: all 0.2s ease;
+    }
+
+    .glass:hover {
+      border-color: rgba(255, 255, 255, 0.18);
+      box-shadow: 0 30px 55px -15px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+    }
+
+    .card h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      letter-spacing: -0.2px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      padding-bottom: 0.9rem;
+    }
+
+    /* ---------- 4TH SUBJECT SELECTOR ---------- */
+    .opt-selector {
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+      background: rgba(8, 15, 35, 0.6);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 1.2rem;
+      padding: 0.9rem 1.2rem;
+      margin-bottom: 1.6rem;
+      box-shadow: 0 8px 20px -8px black;
+    }
+
+    .opt-selector label {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #ccd9ff;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .opt-selector select {
+      flex: 1;
+      background: rgba(20, 30, 60, 0.8);
+      backdrop-filter: blur(8px);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 0.9rem;
+      padding: 0.7rem 1rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      outline: none;
+      cursor: pointer;
+      transition: 0.15s;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23a8b5e0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      background-size: 16px;
+    }
+
+    .opt-selector select:focus {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 3px rgba(107, 158, 255, 0.2);
+    }
+
+    /* ---------- SUBJECT TABLE (glass style) ---------- */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1.8rem;
+    }
+
+    th {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      text-align: left;
+      padding: 0.6rem 0.3rem;
+      font-weight: 600;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    td {
+      padding: 0.65rem 0.3rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      vertical-align: middle;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .subname {
+      font-weight: 600;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-blue);
+      box-shadow: 0 0 10px rgba(107, 158, 255, 0.8);
+      flex: none;
+    }
+
+    .opt-tag {
+      font-size: 0.6rem;
+      font-weight: 800;
+      background: rgba(255, 190, 60, 0.25);
+      backdrop-filter: blur(4px);
+      color: #ffe5a3;
+      padding: 0.2rem 0.7rem;
+      border-radius: 40px;
+      letter-spacing: 0.5px;
+      border: 1px solid rgba(255, 190, 60, 0.4);
+      white-space: nowrap;
+    }
+
+    /* ---------- INPUT FIELDS (glass) ---------- */
+    .marks-box {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .marks-box input {
+      width: 80px;
+      background: rgba(8, 15, 35, 0.7);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: white;
+      border-radius: 1rem;
+      padding: 0.65rem 0.7rem;
+      font-size: 0.95rem;
+      font-weight: 700;
+      text-align: center;
+      outline: none;
+      transition: 0.15s;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      -moz-appearance: textfield;
+    }
+
+    .marks-box input::-webkit-outer-spin-button,
+    .marks-box input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    .marks-box input:focus {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 3px rgba(107, 158, 255, 0.2), 0 4px 12px rgba(0, 0, 0, 0.4);
+      background: rgba(12, 22, 45, 0.9);
+    }
+
+    .max-tag {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      font-weight: 500;
+      opacity: 0.8;
+    }
+
+    /* ---------- GRADE PILLS (glass badges) ---------- */
+    .grade-pill {
+      display: inline-block;
+      min-width: 65px;
+      text-align: center;
+      font-weight: 800;
+      padding: 0.35rem 0.7rem;
+      border-radius: 1rem;
+      font-size: 0.75rem;
+      letter-spacing: 0.3px;
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 4px 10px -2px rgba(0, 0, 0, 0.4);
+      transition: 0.15s;
+    }
+
+    .g5 { background: rgba(95, 224, 139, 0.2); color: #b0ffd0; border-color: rgba(95, 224, 139, 0.5); }
+    .g4 { background: rgba(107, 158, 255, 0.2); color: #b8d0ff; border-color: rgba(107, 158, 255, 0.5); }
+    .g35 { background: rgba(178, 130, 255, 0.2); color: #dcc8ff; border-color: rgba(178, 130, 255, 0.5); }
+    .g3 { background: rgba(255, 190, 60, 0.2); color: #ffe5a3; border-color: rgba(255, 190, 60, 0.5); }
+    .g225 { background: rgba(255, 169, 107, 0.2); color: #ffd6b0; border-color: rgba(255, 169, 107, 0.5); }
+    .g2 { background: rgba(255, 123, 123, 0.2); color: #ffc0c0; border-color: rgba(255, 123, 123, 0.5); }
+    .g0 { background: rgba(255, 70, 70, 0.3); color: #ffb0b0; border-color: rgba(255, 70, 70, 0.7); }
+
+    /* ---------- BUTTONS (glass with glow) ---------- */
+    .btns {
+      display: flex;
+      gap: 0.8rem;
+      margin-top: 1.8rem;
+      flex-wrap: wrap;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      border-radius: 1.2rem;
+      font-weight: 800;
+      font-size: 0.9rem;
+      padding: 0.9rem 1.5rem;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      letter-spacing: 0.2px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-calc {
+      background: linear-gradient(120deg, rgba(255, 190, 60, 0.95), rgba(255, 120, 60, 0.95));
+      color: #1a1200;
+      flex: 1;
+      min-width: 150px;
+      border: 1px solid rgba(255, 210, 120, 0.8);
+      box-shadow: 0 8px 28px -8px #ff9f2e;
+    }
+
+    .btn-calc:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 16px 32px -10px #ffa73c;
+      background: linear-gradient(120deg, #ffc85c, #ff8b4d);
+    }
+
+    .btn-ghost {
+      background: rgba(30, 42, 80, 0.7);
+      color: #d0dfff;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .btn-ghost:hover {
+      background: rgba(48, 68, 130, 0.8);
+      border-color: rgba(107, 158, 255, 0.5);
+      transform: translateY(-2px);
+      color: white;
+    }
+
+    /* ---------- RESULT SIDE ---------- */
+    .result {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .result h2 {
+      justify-content: center;
+      border-bottom-color: rgba(255, 255, 255, 0.08);
+    }
+
+    #emptyMsg {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-top: 2rem;
+      line-height: 1.8;
+    }
+
+    .gpa-big {
+      font-size: clamp(4rem, 12vw, 5.8rem);
+      font-weight: 900;
+      line-height: 1;
+      background: linear-gradient(110deg, #b8d0ff, #ffbe3c);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      filter: drop-shadow(0 8px 25px rgba(255, 190, 60, 0.3));
+      letter-spacing: -2px;
+    }
+
+    .gpa-label {
+      font-size: 0.75rem;
+      letter-spacing: 3px;
+      color: var(--text-muted);
+      margin-top: 0.2rem;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+
+    .grade-big {
+      font-size: 2rem;
+      font-weight: 900;
+      margin: 0.8rem 0 0.2rem;
+      text-shadow: 0 0 25px rgba(255, 255, 255, 0.3);
+    }
+
+    .verdict {
+      display: inline-block;
+      margin-top: 0.5rem;
+      padding: 0.6rem 1.6rem;
+      border-radius: 40px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      background: rgba(95, 224, 139, 0.15);
+      color: #a8ffc5;
+      border: 1px solid rgba(95, 224, 139, 0.4);
+      backdrop-filter: blur(6px);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      letter-spacing: 0.2px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.9rem;
+      margin-top: 1.8rem;
+    }
+
+    .stat {
+      background: rgba(8, 15, 35, 0.5);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 1.4rem;
+      padding: 1rem 0.7rem;
+      box-shadow: 0 6px 16px -6px black;
+      transition: 0.15s;
+    }
+
+    .stat:hover {
+      background: rgba(16, 26, 55, 0.6);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .stat b {
+      display: block;
+      font-size: 1.3rem;
+      font-weight: 800;
+      margin-bottom: 0.2rem;
+      color: #fff;
+      letter-spacing: -0.5px;
+    }
+
+    .stat small {
+      color: var(--text-muted);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      font-weight: 500;
+    }
+
+    /* ---------- SCALE (glass) ---------- */
+    .scale {
+      margin-top: 2rem;
+      background: rgba(8, 15, 35, 0.45);
+      backdrop-filter: blur(12px);
+      border-radius: 1.5rem;
+      padding: 1.2rem 1.2rem;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .scale h3 {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+      margin-bottom: 0.8rem;
+      font-weight: 600;
+    }
+
+    .scale-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.45rem 0.2rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 0.8rem;
+      color: #d0dcff;
+    }
+
+    .scale-row:last-child {
+      border-bottom: none;
+    }
+
+    .scale-row b {
+      font-weight: 700;
+      color: var(--accent-gold);
+    }
+
+    /* ---------- FOOTER ---------- */
+    .foot {
+      margin-top: 2rem;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      line-height: 1.7;
+      opacity: 0.8;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+      padding: 0 0.5rem;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(10, 15, 30, 0.5);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(107, 158, 255, 0.4);
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(107, 158, 255, 0.7);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="badge">✦ SSC '27 • Session 2025–26 ✦</div>
+      <h1>SSC <span>GPA Calculator</span></h1>
+      <p class="sub">Enter marks — glass-smooth grades, GPA & 4th subject bonus appear instantly</p>
+    </header>
+
+    <div class="grid">
+      <!-- LEFT: input card -->
+      <div class="card glass">
+        <h2>📝 Enter Marks</h2>
+
+        <div class="opt-selector">
+          <label>🎯 4th Subject</label>
+          <select id="optSelect" onchange="optionalName=this.value; render();">
+            <option value="Higher Math">Higher Math</option>
+            <option value="Biology">Biology</option>
+          </select>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Subject</th>
+              <th style="width:200px">Marks</th>
+              <th style="width:70px">Grade</th>
+            </tr>
+          </thead>
+          <tbody id="subjectRows"></tbody>
+        </table>
+
+        <div class="btns">
+          <button class="btn-calc" onclick="calculate()">🧮 Calculate GPA</button>
+          <button class="btn-ghost" onclick="resetAll()">↺ Reset</button>
+          <button class="btn-ghost" onclick="addSubject()">＋ Add Subject</button>
+        </div>
+      </div>
+
+      <!-- RIGHT: result card -->
+      <div class="card glass result">
+        <h2>🎓 Your Result</h2>
+
+        <div id="emptyMsg">
+          Enter marks on the left,<br>then press "Calculate GPA"
+        </div>
+
+        <div id="resBody" class="hidden">
+          <div class="gpa-big" id="gpaVal">0.00</div>
+          <div class="gpa-label">GPA / 5.00</div>
+          <div class="grade-big" id="gradeVal">—</div>
+          <div class="verdict" id="verdict">—</div>
+
+          <div class="stats">
+            <div class="stat"><b id="totalMarks">0</b><small>Total Marks</small></div>
+            <div class="stat"><b id="subCount">0</b><small>Subjects Counted</small></div>
+            <div class="stat"><b id="gpaNo4">—</b><small>GPA without 4th</small></div>
+            <div class="stat"><b id="bestSub">—</b><small>Best Subject</small></div>
+          </div>
+        </div>
+
+        <div class="scale">
+          <h3>📊 Grading Scale</h3>
+          <div class="scale-row"><span>80 – 100%</span><b>A+ (5.00)</b></div>
+          <div class="scale-row"><span>70 – 79%</span><b>A (4.00)</b></div>
+          <div class="scale-row"><span>60 – 69%</span><b>A− (3.50)</b></div>
+          <div class="scale-row"><span>50 – 59%</span><b>B (3.00)</b></div>
+          <div class="scale-row"><span>40 – 49%</span><b>C (2.25)</b></div>
+          <div class="scale-row"><span>33 – 39%</span><b>D (2.00)</b></div>
+          <div class="scale-row"><span>0 – 32%</span><b>F (0.00)</b></div>
+        </div>
+      </div>
+    </div>
+
+    <p class="foot">⚠️ For reference only — verify with your board. Bangla & English papers combine into one grade. 50-mark subjects (ICT, PE, Career) graded on percentage. 4th subject bonus: (point − 2) ÷ 2 added when above D.</p>
+  </div>
+
+  <script>
+    // ---------- SUBJECT DATA ----------
+    const defaultSubjects = [
+      {name:"Bangla (1st + 2nd)", parts:["1st Paper","2nd Paper"], max:[100,100]},
+      {name:"English (1st + 2nd)", parts:["1st Paper","2nd Paper"], max:[100,100]},
+      {name:"Mathematics", parts:["Marks"], max:[100]},
+      {name:"Physics", parts:["Marks"], max:[100]},
+      {name:"Chemistry", parts:["Marks"], max:[100]},
+      {name:"Biology", parts:["Marks"], max:[100]},
+      {name:"Higher Math", parts:["Marks"], max:[100]},
+      {name:"ICT", parts:["Marks"], max:[50]},
+      {name:"Bangladesh & Global Studies", parts:["Marks"], max:[100]},
+      {name:"Islam & Moral Education", parts:["Marks"], max:[100]},
+      {name:"Physical Education", parts:["Marks"], max:[50]},
+      {name:"Career & Life Skills", parts:["Marks"], max:[50]},
+    ];
+
+    let subjects = JSON.parse(JSON.stringify(defaultSubjects));
+    let optionalName = "Higher Math";   // 4th subject by default
+
+    const optionalIdx = () => subjects.findIndex(s => s.name === optionalName);
+
+    // ---------- GRADING FUNCTION ----------
+    function gradeInfo(pct) {
+      if (pct >= 80) return {g:"A+", p:5.00, cls:"g5"};
+      if (pct >= 70) return {g:"A",  p:4.00, cls:"g4"};
+      if (pct >= 60) return {g:"A−", p:3.50, cls:"g35"};
+      if (pct >= 50) return {g:"B",  p:3.00, cls:"g3"};
+      if (pct >= 40) return {g:"C",  p:2.25, cls:"g225"};
+      if (pct >= 33) return {g:"D",  p:2.00, cls:"g2"};
+      return {g:"F", p:0.00, cls:"g0"};
+    }
+
+    // ---------- RENDER SUBJECT ROWS ----------
+    function render() {
+      const tb = document.getElementById("subjectRows");
+      tb.innerHTML = "";
+
+      subjects.forEach((s, i) => {
+        const tr = document.createElement("tr");
+
+        // badge for 4th subject
+        const isOpt = (s.name === optionalName);
+        const optBadge = isOpt ? ' <span class="opt-tag">4TH</span>' : '';
+
+        // build input boxes
+        let inputs = "";
+        s.parts.forEach((p, j) => {
+          inputs += `<input type="number" min="0" max="${s.max[j]}" placeholder="${s.max[j]}" id="m${i}_${j}" oninput="liveGrade(${i})">`;
+        });
+
+        const totalMax = s.max.reduce((a, b) => a + b, 0);
+
+        tr.innerHTML = `
+          <td class="subname"><span class="dot"></span>${s.name}${optBadge}</td>
+          <td>
+            <div class="marks-box">
+              ${inputs}
+              <span class="max-tag">/${totalMax}</span>
+            </div>
+          </td>
+          <td><span class="grade-pill g3" id="g${i}">—</span></td>
+        `;
+        tb.appendChild(tr);
+      });
+    }
+
+    // ---------- GET SUBJECT PERCENTAGE ----------
+    function getSubjectPct(i) {
+      const s = subjects[i];
+      let obtained = 0;
+      let max = 0;
+      let any = false;
+
+      s.parts.forEach((p, j) => {
+        const el = document.getElementById(`m${i}_${j}`);
+        if (!el) return;
+        const v = el.value;
+        if (v !== "") {
+          any = true;
+          obtained += Math.max(0, Math.min(s.max[j], parseFloat(v) || 0));
+        }
+        max += s.max[j];
+      });
+
+      if (!any) return { pct: null, obtained, max, filled: false };
+      return { pct: (obtained / max) * 100, obtained, max, filled: true };
+    }
+
+    // ---------- LIVE GRADE UPDATE ----------
+    function liveGrade(i) {
+      const pill = document.getElementById("g" + i);
+      const r = getSubjectPct(i);
+
+      if (r.pct === null) {
+        pill.textContent = "—";
+        pill.className = "grade-pill g3";
+        return;
+      }
+
+      const gi = gradeInfo(r.pct);
+      pill.textContent = `${gi.g} (${gi.p.toFixed(2)})`;
+      pill.className = `grade-pill ${gi.cls}`;
+    }
+
+    // ---------- CALCULATE GPA ----------
+    function calculate() {
+      const oIdx = optionalIdx();
+      const isOpt = oIdx !== -1;
+
+      let total = 0;
+      let maxTotal = 0;
+      let count = 0;
+      let countNo4 = 0;
+      let sumNo4 = 0;
+      let bestPct = -1;
+      let bestName = "";
+      let fail = false;
+
+      const rows = [];
+
+      // gather filled subjects
+      subjects.forEach((_, i) => {
+        const r = getSubjectPct(i);
+        if (!r.filled) return;
+
+        const gi = gradeInfo(r.pct);
+        rows.push({ i, pct: r.pct, p: gi.p });
+
+        total += r.obtained;
+        maxTotal += r.max;
+        count++;
+
+        if (r.pct > bestPct) {
+          bestPct = r.pct;
+          bestName = subjects[i].name;
+        }
+        if (gi.g === "F") fail = true;
+      });
+
+      if (count === 0) {
+        alert("Please enter marks for at least one subject!");
+        return;
+      }
+
+      // calculate sum with 4th subject bonus (only if 4th is filled)
+      let sum = 0;
+      rows.forEach(r => {
+        if (isOpt && r.i === oIdx) {
+          // 4th subject: only count if point > 2 (bonus)
+          if (r.p > 2.00) sum += (r.p - 2) / 2;
+          // else contributes 0 — but we still count it as subject? No: handled below
+        } else {
+          sum += r.p;
+          sumNo4 += r.p;
+          countNo4++;
+        }
+      });
+
+      // how many subjects actually counted for GPA?
+      const fourthFilled = isOpt && rows.some(r => r.i === oIdx);
+      const n = fourthFilled ? count - 1 : count;  // exclude 4th from divisor if present
+
+      const gpa = fail ? 0 : Math.min(5.00, sum / n);
+      const gpaNo4 = countNo4 ? Math.min(5.00, sumNo4 / countNo4) : NaN;
+
+      const overall = gradeInfo(fail ? 0 : gpa * 20);   // gpa*20 = percentage equivalent
+
+      // update UI
+      document.getElementById("emptyMsg").classList.add("hidden");
+      document.getElementById("resBody").classList.remove("hidden");
+
+      document.getElementById("gpaVal").textContent = gpa.toFixed(2);
+      document.getElementById("gradeVal").textContent = fail ? "F ❌" : overall.g + " ✅";
+      document.getElementById("totalMarks").textContent = total + "/" + maxTotal;
+      document.getElementById("subCount").textContent = count;
+      document.getElementById("gpaNo4").textContent = isNaN(gpaNo4) ? "—" : gpaNo4.toFixed(2);
+
+      const bestShort = bestName.split("(")[0].trim();
+      document.getElementById("bestSub").textContent = `${bestShort} (${bestPct.toFixed(0)}%)`;
+
+      // verdict styling
+      const vd = document.getElementById("verdict");
+      vd.style.background = "rgba(95, 224, 139, 0.15)";
+      vd.style.color = "#a8ffc5";
+      vd.style.borderColor = "rgba(95, 224, 139, 0.4)";
+
+      if (fail) {
+        vd.textContent = "❌ Failed (F grade present)";
+        vd.style.background = "rgba(255, 123, 123, 0.15)";
+        vd.style.color = "#ffc0c0";
+        vd.style.borderColor = "rgba(255, 123, 123, 0.5)";
+      } else if (gpa >= 5.00) {
+        vd.textContent = "🏆 Golden GPA — Congratulations!";
+      } else if (gpa >= 4.00) {
+        vd.textContent = "🎉 Excellent Result!";
+      } else if (gpa >= 3.00) {
+        vd.textContent = "👍 Good Result!";
+      } else {
+        vd.textContent = "💪 Keep trying, you can do better!";
+        vd.style.background = "rgba(255, 190, 60, 0.15)";
+        vd.style.color = "#ffe5a3";
+        vd.style.borderColor = "rgba(255, 190, 60, 0.4)";
+      }
+
+      document.getElementById("resBody").scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    // ---------- RESET ----------
+    function resetAll() {
+      subjects = JSON.parse(JSON.stringify(defaultSubjects));
+      optionalName = "Higher Math";
+      document.getElementById("optSelect").value = "Higher Math";
+      render();
+      document.getElementById("resBody").classList.add("hidden");
+      document.getElementById("emptyMsg").classList.remove("hidden");
+    }
+
+    // ---------- ADD SUBJECT ----------
+    function addSubject() {
+      const name = prompt("Enter the new subject name:", "Extra Subject");
+      if (name && name.trim()) {
+        const mk = prompt("Full marks of this subject?", "100");
+        const max = Math.max(1, parseInt(mk) || 100);
+        subjects.push({ name: name.trim(), parts: ["Marks"], max: [max] });
+        render();
+      }
+    }
+
+    // ---------- INITIAL RENDER ----------
+    render();
+  </script>
+</body>
+</html>
