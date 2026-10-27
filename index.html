@@ -3,235 +3,179 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SSC '27 GPA — Calculator</title>
+  <title>SSC GPA Calculator</title>
   <style>
-    /* ---------- GLOBAL GLASS & ADVANCED UI ---------- */
+    /* ---------- DARK MINIMAL ---------- */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-    }
-
-    :root {
-      --glass-bg: rgba(20, 28, 58, 0.55);
-      --glass-border: rgba(255, 255, 255, 0.12);
-      --glass-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.03) inset;
-      --blur-amt: 18px;
-      --text-primary: #f0f4ff;
-      --text-muted: #a8b5e0;
-      --accent-gold: #ffbe3c;
-      --accent-blue: #6b9eff;
-      --accent-green: #5fe08b;
-      --accent-red: #ff7b7b;
-      --accent-orange: #ffa96b;
+      font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
     }
 
     body {
-      background: radial-gradient(circle at 20% 0%, #1d2c5c, #0a0f22 70%);
+      background: #0a0c10;
       min-height: 100vh;
-      padding: 2rem 1.25rem;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--text-primary);
-      backdrop-filter: blur(2px);
+      padding: 1.5rem 1rem;
+      color: #e8edf5;
     }
 
-    /* floating orbs for depth */
-    body::before,
-    body::after {
-      content: '';
-      position: fixed;
-      border-radius: 50%;
-      filter: blur(100px);
-      opacity: 0.4;
-      z-index: -1;
-      pointer-events: none;
-    }
-
-    body::before {
-      width: 600px;
-      height: 600px;
-      background: #2f4fa8;
-      top: -20%;
-      right: -10%;
-    }
-
-    body::after {
-      width: 500px;
-      height: 500px;
-      background: #c76e00;
-      bottom: -20%;
-      left: -10%;
-      opacity: 0.25;
-    }
-
-    .wrap {
-      max-width: 1200px;
+    .app {
+      max-width: 1100px;
       width: 100%;
       margin: 0 auto;
     }
 
-    /* ---------- HEADER ---------- */
-    header {
-      text-align: center;
+    /* ----- HEADER ----- */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
       margin-bottom: 2rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .header-left h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: #f0f4fa;
+    }
+
+    .header-left h1 span {
+      color: #7aa2ff;
+    }
+
+    .header-left p {
+      color: #5e6f8d;
+      font-size: 0.85rem;
+      margin-top: 0.2rem;
+      font-weight: 400;
     }
 
     .badge {
-      display: inline-block;
-      background: rgba(255, 190, 60, 0.15);
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 190, 60, 0.4);
-      color: #ffd98a;
-      font-weight: 700;
-      padding: 0.45rem 1.5rem;
-      border-radius: 40px;
-      font-size: 0.85rem;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      margin-bottom: 1rem;
-      box-shadow: 0 0 20px rgba(255, 190, 60, 0.15);
+      background: #141a24;
+      border-radius: 100px;
+      padding: 0.4rem 1rem;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #7aa2ff;
+      border: 1px solid #232c3d;
+      white-space: nowrap;
     }
 
-    h1 {
-      font-size: clamp(2.2rem, 6vw, 3.8rem);
-      font-weight: 800;
-      line-height: 1.2;
-      letter-spacing: -1px;
-      text-shadow: 0 2px 20px rgba(0, 0, 0, 0.4);
-    }
-
-    h1 span {
-      background: linear-gradient(100deg, #b8d0ff, #ffbe3c);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-
-    .sub {
-      color: var(--text-muted);
-      font-size: 1rem;
-      margin-top: 0.6rem;
-      font-weight: 400;
-      letter-spacing: 0.2px;
-    }
-
-    /* ---------- GLASS CARDS GRID ---------- */
+    /* ----- GRID ----- */
     .grid {
       display: grid;
-      grid-template-columns: 1.5fr 1fr;
-      gap: 1.75rem;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 1.5rem;
       align-items: start;
     }
 
-    @media (max-width: 900px) {
+    @media (max-width: 780px) {
       .grid {
         grid-template-columns: 1fr;
-        gap: 1.5rem;
+        gap: 1.25rem;
+      }
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
       }
     }
 
-    /* ---------- GLASS CARD BASE ---------- */
-    .glass {
-      background: var(--glass-bg);
-      backdrop-filter: blur(var(--blur-amt)) saturate(140%);
-      -webkit-backdrop-filter: blur(var(--blur-amt)) saturate(140%);
-      border: 1px solid var(--glass-border);
-      border-radius: 2rem;
-      box-shadow: var(--glass-shadow);
-      padding: 2rem 1.8rem;
-      transition: all 0.2s ease;
+    /* ----- CARDS ----- */
+    .card {
+      background: #0f131a;
+      border-radius: 24px;
+      padding: 1.8rem 1.6rem;
+      border: 1px solid #1e2633;
+      transition: 0.15s ease;
     }
 
-    .glass:hover {
-      border-color: rgba(255, 255, 255, 0.18);
-      box-shadow: 0 30px 55px -15px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+    .card:hover {
+      border-color: #2a3548;
     }
 
-    .card h2 {
-      font-size: 1.3rem;
-      font-weight: 700;
-      margin-bottom: 1.5rem;
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      letter-spacing: -0.2px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-      padding-bottom: 0.9rem;
-    }
-
-    /* ---------- 4TH SUBJECT SELECTOR ---------- */
-    .opt-selector {
-      display: flex;
-      align-items: center;
-      gap: 0.9rem;
-      background: rgba(8, 15, 35, 0.6);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 1.2rem;
-      padding: 0.9rem 1.2rem;
-      margin-bottom: 1.6rem;
-      box-shadow: 0 8px 20px -8px black;
-    }
-
-    .opt-selector label {
-      font-size: 0.9rem;
-      font-weight: 700;
-      color: #ccd9ff;
-      white-space: nowrap;
-      display: flex;
-      align-items: center;
-      gap: 0.3rem;
-    }
-
-    .opt-selector select {
-      flex: 1;
-      background: rgba(20, 30, 60, 0.8);
-      backdrop-filter: blur(8px);
-      color: white;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 0.9rem;
-      padding: 0.7rem 1rem;
-      font-size: 0.95rem;
+    .card-title {
+      font-size: 1.05rem;
       font-weight: 600;
+      letter-spacing: -0.01em;
+      color: #dbe3f0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1.4rem;
+      padding-bottom: 0.7rem;
+      border-bottom: 1px solid #1e2633;
+    }
+
+    /* ----- 4th subject selector ----- */
+    .opt-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: #0a0e14;
+      border: 1px solid #1e2633;
+      border-radius: 16px;
+      padding: 0.6rem 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .opt-row label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #a0b2d0;
+      white-space: nowrap;
+    }
+
+    .opt-row select {
+      flex: 1;
+      background: transparent;
+      border: none;
+      padding: 0.5rem 0.2rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #e8edf5;
       outline: none;
       cursor: pointer;
-      transition: 0.15s;
       appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23a8b5e0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%235e6f8d' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
       background-repeat: no-repeat;
-      background-position: right 1rem center;
-      background-size: 16px;
+      background-position: right 0.5rem center;
+      background-size: 14px;
     }
 
-    .opt-selector select:focus {
-      border-color: var(--accent-blue);
-      box-shadow: 0 0 0 3px rgba(107, 158, 255, 0.2);
+    .opt-row select option {
+      background: #0f131a;
+      color: #e8edf5;
     }
 
-    /* ---------- SUBJECT TABLE (glass style) ---------- */
+    /* ----- TABLE ----- */
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-bottom: 1.8rem;
+      font-size: 0.85rem;
     }
 
     th {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: var(--text-muted);
       text-align: left;
-      padding: 0.6rem 0.3rem;
       font-weight: 600;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #5e6f8d;
+      padding: 0.5rem 0.2rem;
+      border-bottom: 1px solid #1e2633;
     }
 
     td {
-      padding: 0.65rem 0.3rem;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 0.55rem 0.2rem;
+      border-bottom: 1px solid #161c26;
       vertical-align: middle;
     }
 
@@ -239,645 +183,660 @@
       border-bottom: none;
     }
 
-    .subname {
-      font-weight: 600;
-      font-size: 0.95rem;
+    .subject-name {
+      font-weight: 500;
       display: flex;
       align-items: center;
-      gap: 0.6rem;
+      gap: 0.4rem;
       flex-wrap: wrap;
-    }
-
-    .dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--accent-blue);
-      box-shadow: 0 0 10px rgba(107, 158, 255, 0.8);
-      flex: none;
+      color: #c8d4e6;
     }
 
     .opt-tag {
-      font-size: 0.6rem;
-      font-weight: 800;
-      background: rgba(255, 190, 60, 0.25);
-      backdrop-filter: blur(4px);
-      color: #ffe5a3;
-      padding: 0.2rem 0.7rem;
-      border-radius: 40px;
-      letter-spacing: 0.5px;
-      border: 1px solid rgba(255, 190, 60, 0.4);
+      font-size: 0.55rem;
+      font-weight: 700;
+      background: #1a2332;
+      color: #7aa2ff;
+      padding: 0.15rem 0.5rem;
+      border-radius: 20px;
+      letter-spacing: 0.02em;
+      border: 1px solid #2a3a55;
       white-space: nowrap;
     }
 
-    /* ---------- INPUT FIELDS (glass) ---------- */
-    .marks-box {
+    .marks-wrap {
       display: flex;
-      gap: 0.5rem;
       align-items: center;
+      gap: 0.3rem;
       flex-wrap: wrap;
     }
 
-    .marks-box input {
-      width: 80px;
-      background: rgba(8, 15, 35, 0.7);
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      color: white;
-      border-radius: 1rem;
-      padding: 0.65rem 0.7rem;
-      font-size: 0.95rem;
-      font-weight: 700;
+    .marks-wrap input {
+      width: 70px;
+      border: 1px solid #232c3d;
+      border-radius: 10px;
+      padding: 0.45rem 0.3rem;
+      font-size: 0.85rem;
+      font-weight: 600;
       text-align: center;
+      color: #e8edf5;
+      background: #0a0e14;
       outline: none;
-      transition: 0.15s;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      transition: 0.12s;
       -moz-appearance: textfield;
     }
 
-    .marks-box input::-webkit-outer-spin-button,
-    .marks-box input::-webkit-inner-spin-button {
+    .marks-wrap input::-webkit-outer-spin-button,
+    .marks-wrap input::-webkit-inner-spin-button {
       -webkit-appearance: none;
       margin: 0;
     }
 
-    .marks-box input:focus {
-      border-color: var(--accent-blue);
-      box-shadow: 0 0 0 3px rgba(107, 158, 255, 0.2), 0 4px 12px rgba(0, 0, 0, 0.4);
-      background: rgba(12, 22, 45, 0.9);
+    .marks-wrap input:focus {
+      border-color: #4a7aff;
+      box-shadow: 0 0 0 3px rgba(74, 122, 255, 0.12);
+    }
+
+    .marks-wrap input::placeholder {
+      color: #3f4d63;
+      font-weight: 400;
+      font-size: 0.75rem;
     }
 
     .max-tag {
-      font-size: 0.65rem;
-      color: var(--text-muted);
-      white-space: nowrap;
+      font-size: 0.6rem;
+      color: #4f5f78;
       font-weight: 500;
-      opacity: 0.8;
+      white-space: nowrap;
     }
 
-    /* ---------- GRADE PILLS (glass badges) ---------- */
+    /* ----- GRADE PILLS (dark minimal) ----- */
     .grade-pill {
       display: inline-block;
-      min-width: 65px;
+      min-width: 60px;
       text-align: center;
-      font-weight: 800;
-      padding: 0.35rem 0.7rem;
-      border-radius: 1rem;
-      font-size: 0.75rem;
-      letter-spacing: 0.3px;
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: 0 4px 10px -2px rgba(0, 0, 0, 0.4);
-      transition: 0.15s;
+      font-weight: 700;
+      font-size: 0.7rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: 30px;
+      background: #161c26;
+      color: #8a9bb8;
+      border: 1px solid #232c3d;
+      transition: 0.1s;
     }
 
-    .g5 { background: rgba(95, 224, 139, 0.2); color: #b0ffd0; border-color: rgba(95, 224, 139, 0.5); }
-    .g4 { background: rgba(107, 158, 255, 0.2); color: #b8d0ff; border-color: rgba(107, 158, 255, 0.5); }
-    .g35 { background: rgba(178, 130, 255, 0.2); color: #dcc8ff; border-color: rgba(178, 130, 255, 0.5); }
-    .g3 { background: rgba(255, 190, 60, 0.2); color: #ffe5a3; border-color: rgba(255, 190, 60, 0.5); }
-    .g225 { background: rgba(255, 169, 107, 0.2); color: #ffd6b0; border-color: rgba(255, 169, 107, 0.5); }
-    .g2 { background: rgba(255, 123, 123, 0.2); color: #ffc0c0; border-color: rgba(255, 123, 123, 0.5); }
-    .g0 { background: rgba(255, 70, 70, 0.3); color: #ffb0b0; border-color: rgba(255, 70, 70, 0.7); }
+    .g5 { background: #0d2318; color: #6ee7a0; border-color: #1b3d2a; }
+    .g4 { background: #0e1a2e; color: #7aa2ff; border-color: #1e3050; }
+    .g35 { background: #1a122e; color: #b794ff; border-color: #2e224a; }
+    .g3 { background: #241a0a; color: #ffbe5c; border-color: #3d2e12; }
+    .g225 { background: #24140e; color: #ff9a6b; border-color: #3d2012; }
+    .g2 { background: #241010; color: #ff7b7b; border-color: #3d1a1a; }
+    .g0 { background: #2a0e0e; color: #ff5e5e; border-color: #4a1616; font-weight: 800; }
 
-    /* ---------- BUTTONS (glass with glow) ---------- */
-    .btns {
+    /* ----- BUTTONS ----- */
+    .actions {
       display: flex;
-      gap: 0.8rem;
-      margin-top: 1.8rem;
+      gap: 0.6rem;
+      margin-top: 1.6rem;
       flex-wrap: wrap;
     }
 
-    button {
+    .btn {
       cursor: pointer;
-      border: none;
-      border-radius: 1.2rem;
-      font-weight: 800;
-      font-size: 0.9rem;
-      padding: 0.9rem 1.5rem;
-      transition: all 0.2s ease;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 0.8rem;
+      padding: 0.7rem 1.4rem;
+      transition: 0.12s;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 0.5rem;
-      letter-spacing: 0.2px;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.5);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      gap: 0.4rem;
+      background: #0a0e14;
+      border: 1px solid #232c3d;
+      color: #c8d4e6;
+      letter-spacing: 0.01em;
     }
 
-    .btn-calc {
-      background: linear-gradient(120deg, rgba(255, 190, 60, 0.95), rgba(255, 120, 60, 0.95));
-      color: #1a1200;
-      flex: 1;
-      min-width: 150px;
-      border: 1px solid rgba(255, 210, 120, 0.8);
-      box-shadow: 0 8px 28px -8px #ff9f2e;
+    .btn-primary {
+      background: #1e2e52;
+      border-color: #2a3f6b;
+      color: #e8edf5;
     }
 
-    .btn-calc:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 16px 32px -10px #ffa73c;
-      background: linear-gradient(120deg, #ffc85c, #ff8b4d);
+    .btn-primary:hover {
+      background: #263a66;
+      border-color: #3a5590;
     }
 
-    .btn-ghost {
-      background: rgba(30, 42, 80, 0.7);
-      color: #d0dfff;
-      border: 1px solid rgba(255, 255, 255, 0.12);
+    .btn:hover {
+      background: #141a24;
+      border-color: #2e3a4f;
+      color: #e8edf5;
     }
 
-    .btn-ghost:hover {
-      background: rgba(48, 68, 130, 0.8);
-      border-color: rgba(107, 158, 255, 0.5);
-      transform: translateY(-2px);
-      color: white;
-    }
-
-    /* ---------- RESULT SIDE ---------- */
-    .result {
-      text-align: center;
+    /* ----- RESULT SIDE (dark minimal) ----- */
+    .result-card {
       display: flex;
       flex-direction: column;
+      height: 100%;
     }
 
-    .result h2 {
-      justify-content: center;
-      border-bottom-color: rgba(255, 255, 255, 0.08);
+    .result-empty {
+      color: #4f5f78;
+      font-size: 0.85rem;
+      text-align: center;
+      padding: 2rem 0.5rem;
+      line-height: 1.7;
+      border-radius: 18px;
+      background: #0a0e14;
+      border: 1px dashed #1e2633;
     }
 
-    #emptyMsg {
-      color: var(--text-muted);
-      font-size: 0.95rem;
-      margin-top: 2rem;
-      line-height: 1.8;
-    }
-
-    .gpa-big {
-      font-size: clamp(4rem, 12vw, 5.8rem);
-      font-weight: 900;
-      line-height: 1;
-      background: linear-gradient(110deg, #b8d0ff, #ffbe3c);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      filter: drop-shadow(0 8px 25px rgba(255, 190, 60, 0.3));
-      letter-spacing: -2px;
-    }
-
-    .gpa-label {
-      font-size: 0.75rem;
-      letter-spacing: 3px;
-      color: var(--text-muted);
-      margin-top: 0.2rem;
-      text-transform: uppercase;
-      font-weight: 500;
-    }
-
-    .grade-big {
-      font-size: 2rem;
-      font-weight: 900;
-      margin: 0.8rem 0 0.2rem;
-      text-shadow: 0 0 25px rgba(255, 255, 255, 0.3);
-    }
-
-    .verdict {
-      display: inline-block;
-      margin-top: 0.5rem;
-      padding: 0.6rem 1.6rem;
-      border-radius: 40px;
-      font-weight: 700;
-      font-size: 0.9rem;
-      background: rgba(95, 224, 139, 0.15);
-      color: #a8ffc5;
-      border: 1px solid rgba(95, 224, 139, 0.4);
-      backdrop-filter: blur(6px);
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-      letter-spacing: 0.2px;
-    }
-
-    .stats {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.9rem;
-      margin-top: 1.8rem;
-    }
-
-    .stat {
-      background: rgba(8, 15, 35, 0.5);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 1.4rem;
-      padding: 1rem 0.7rem;
-      box-shadow: 0 6px 16px -6px black;
-      transition: 0.15s;
-    }
-
-    .stat:hover {
-      background: rgba(16, 26, 55, 0.6);
-      border-color: rgba(255, 255, 255, 0.15);
-    }
-
-    .stat b {
-      display: block;
-      font-size: 1.3rem;
-      font-weight: 800;
-      margin-bottom: 0.2rem;
-      color: #fff;
-      letter-spacing: -0.5px;
-    }
-
-    .stat small {
-      color: var(--text-muted);
-      font-size: 0.65rem;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      font-weight: 500;
-    }
-
-    /* ---------- SCALE (glass) ---------- */
-    .scale {
-      margin-top: 2rem;
-      background: rgba(8, 15, 35, 0.45);
-      backdrop-filter: blur(12px);
-      border-radius: 1.5rem;
-      padding: 1.2rem 1.2rem;
-      border: 1px solid rgba(255, 255, 255, 0.06);
-    }
-
-    .scale h3 {
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      color: var(--text-muted);
-      margin-bottom: 0.8rem;
+    .result-empty strong {
+      color: #7aa2ff;
       font-weight: 600;
     }
 
-    .scale-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 0.45rem 0.2rem;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-      font-size: 0.8rem;
-      color: #d0dcff;
+    .gpa-large {
+      font-size: 4rem;
+      font-weight: 800;
+      line-height: 1;
+      color: #f0f4fa;
+      letter-spacing: -0.04em;
+      margin: 0.5rem 0 0.2rem;
+      text-align: center;
     }
 
-    .scale-row:last-child {
+    .gpa-sub {
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #5e6f8d;
+      font-weight: 500;
+      text-align: center;
+    }
+
+    .grade-large {
+      font-size: 1.5rem;
+      font-weight: 700;
+      text-align: center;
+      margin: 0.6rem 0 0.1rem;
+      color: #f0f4fa;
+    }
+
+    .verdict-badge {
+      display: inline-block;
+      margin: 0.4rem auto 0;
+      padding: 0.4rem 1.2rem;
+      border-radius: 40px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: #0d2318;
+      color: #6ee7a0;
+      border: 1px solid #1b3d2a;
+      text-align: center;
+      align-self: center;
+    }
+
+    .stats-mini {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.6rem;
+      margin-top: 1.5rem;
+    }
+
+    .stat-mini {
+      background: #0a0e14;
+      border-radius: 16px;
+      padding: 0.9rem 0.5rem;
+      text-align: center;
+      border: 1px solid #1e2633;
+    }
+
+    .stat-mini b {
+      display: block;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #dbe3f0;
+      margin-bottom: 0.1rem;
+    }
+
+    .stat-mini small {
+      font-size: 0.55rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #4f5f78;
+      font-weight: 500;
+    }
+
+    /* ----- SCALE (dark minimal) ----- */
+    .scale-box {
+      margin-top: 1.6rem;
+      background: #0a0e14;
+      border-radius: 18px;
+      padding: 1rem 1.2rem;
+      border: 1px solid #1e2633;
+    }
+
+    .scale-box h4 {
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #4f5f78;
+      margin-bottom: 0.6rem;
+      font-weight: 600;
+    }
+
+    .scale-item {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      padding: 0.25rem 0;
+      border-bottom: 1px solid #161c26;
+      color: #8a9bb8;
+    }
+
+    .scale-item:last-child {
       border-bottom: none;
     }
 
-    .scale-row b {
+    .scale-item b {
       font-weight: 700;
-      color: var(--accent-gold);
+      color: #c8d4e6;
     }
 
-    /* ---------- FOOTER ---------- */
-    .foot {
-      margin-top: 2rem;
-      text-align: center;
-      color: var(--text-muted);
+    /* footer with telegram & email */
+    .foot-note {
+      margin-top: 1.5rem;
       font-size: 0.7rem;
-      line-height: 1.7;
-      opacity: 0.8;
-      max-width: 800px;
-      margin-left: auto;
-      margin-right: auto;
-      padding: 0 0.5rem;
+      color: #5e6f8d;
+      text-align: center;
+      line-height: 1.8;
+      border-top: 1px solid #1e2633;
+      padding-top: 1.2rem;
+    }
+
+    .foot-note a {
+      color: #7aa2ff;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.15s;
+    }
+
+    .foot-note a:hover {
+      color: #a8c4ff;
+      text-decoration: underline;
+    }
+
+    .foot-note .highlight {
+      color: #7aa2ff;
+      font-weight: 600;
+    }
+
+    .foot-note .separator {
+      margin: 0 0.4rem;
+      color: #2a3548;
     }
 
     .hidden {
       display: none !important;
     }
 
-    /* scrollbar */
+    /* scrollbar dark */
     ::-webkit-scrollbar {
-      width: 8px;
+      width: 6px;
     }
 
     ::-webkit-scrollbar-track {
-      background: rgba(10, 15, 30, 0.5);
+      background: #0a0c10;
     }
 
     ::-webkit-scrollbar-thumb {
-      background: rgba(107, 158, 255, 0.4);
+      background: #1e2633;
       border-radius: 10px;
     }
 
     ::-webkit-scrollbar-thumb:hover {
-      background: rgba(107, 158, 255, 0.7);
+      background: #2a3548;
     }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <div class="badge">✦ SSC '27 • Session 2025–26 ✦</div>
-      <h1>SSC <span>GPA Calculator</span></h1>
-      <p class="sub"> created by <a href=">https://t.me/ctins_community"> Join now in our Telegram group </a></p>
-      <p class="sub"><a href="critical.thinking.institution@gmail.com">Email Support</a>
- </p>
-    </header>
+<div class="app">
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-left">
+      <h1>SSC <span>GPA</span></h1>
+      <p>Session 2025–26</p>
+    </div>
+    <div class="badge">dark mode</div>
+  </div>
 
-    <div class="grid">
-      <!-- LEFT: input card -->
-      <div class="card glass">
-        <h2>📝 Enter Marks</h2>
+  <!-- MAIN GRID -->
+  <div class="grid">
+    <!-- LEFT CARD – INPUT -->
+    <div class="card">
+      <div class="card-title">Subjects and marks</div>
 
-        <div class="opt-selector">
-          <label>🎯 4th Subject</label>
-          <select id="optSelect" onchange="optionalName=this.value; render();">
-            <option value="Higher Math">Higher Math</option>
-            <option value="Biology">Biology</option>
-          </select>
-        </div>
-
-        <table>
-          <thead>
-            <tr>
-              <th>Subject</th>
-              <th style="width:200px">Marks</th>
-              <th style="width:70px">Grade</th>
-            </tr>
-          </thead>
-          <tbody id="subjectRows"></tbody>
-        </table>
-
-        <div class="btns">
-          <button class="btn-calc" onclick="calculate()">🧮 Calculate GPA</button>
-          <button class="btn-ghost" onclick="resetAll()">↺ Reset</button>
-          <button class="btn-ghost" onclick="addSubject()">＋ Add Subject</button>
-        </div>
+      <!-- 4th subject -->
+      <div class="opt-row">
+        <label>4th subject</label>
+        <select id="optSelect" onchange="optionalName=this.value; render();">
+          <option value="Higher Math">Higher Math</option>
+          <option value="Biology">Biology</option>
+        </select>
       </div>
 
-      <!-- RIGHT: result card -->
-      <div class="card glass result">
-        <h2>🎓 Your Result</h2>
+      <!-- SUBJECT TABLE -->
+      <table>
+        <thead>
+          <tr>
+            <th>Subject</th>
+            <th style="width:140px">Marks</th>
+            <th style="width:70px">Grade</th>
+          </tr>
+        </thead>
+        <tbody id="subjectRows"></tbody>
+      </table>
 
-        <div id="emptyMsg">
-          Enter marks on the left,<br>then press "Calculate GPA"
-        </div>
-
-        <div id="resBody" class="hidden">
-          <div class="gpa-big" id="gpaVal">0.00</div>
-          <div class="gpa-label">GPA / 5.00</div>
-          <div class="grade-big" id="gradeVal">—</div>
-          <div class="verdict" id="verdict">—</div>
-
-          <div class="stats">
-            <div class="stat"><b id="totalMarks">0</b><small>Total Marks</small></div>
-            <div class="stat"><b id="subCount">0</b><small>Subjects Counted</small></div>
-            <div class="stat"><b id="gpaNo4">—</b><small>GPA without 4th</small></div>
-            <div class="stat"><b id="bestSub">—</b><small>Best Subject</small></div>
-          </div>
-        </div>
-
-        <div class="scale">
-          <h3>📊 Grading Scale</h3>
-          <div class="scale-row"><span>80 – 100%</span><b>A+ (5.00)</b></div>
-          <div class="scale-row"><span>70 – 79%</span><b>A (4.00)</b></div>
-          <div class="scale-row"><span>60 – 69%</span><b>A− (3.50)</b></div>
-          <div class="scale-row"><span>50 – 59%</span><b>B (3.00)</b></div>
-          <div class="scale-row"><span>40 – 49%</span><b>C (2.25)</b></div>
-          <div class="scale-row"><span>33 – 39%</span><b>D (2.00)</b></div>
-          <div class="scale-row"><span>0 – 32%</span><b>F (0.00)</b></div>
-        </div>
+      <!-- ACTIONS -->
+      <div class="actions">
+        <button class="btn btn-primary" onclick="calculate()">Calculate</button>
+        <button class="btn" onclick="resetAll()">Reset</button>
+        <button class="btn" onclick="addSubject()">Add</button>
       </div>
     </div>
 
-    <p class="foot">⚠️ For reference only — verify with your board. Bangla & English papers combine into one grade. 50-mark subjects (ICT, PE, Career) graded on percentage. 4th subject bonus: (point − 2) ÷ 2 added when above D.</p>
+    <!-- RIGHT CARD – RESULT -->
+    <div class="card result-card">
+      <div class="card-title">Result</div>
+
+      <!-- empty state -->
+      <div id="emptyMsg" class="result-empty">
+        Enter marks and press <strong>Calculate</strong>
+      </div>
+
+      <!-- result body -->
+      <div id="resBody" class="hidden" style="width:100%">
+        <div class="gpa-large" id="gpaVal">0.00</div>
+        <div class="gpa-sub">GPA out of 5.00</div>
+        <div class="grade-large" id="gradeVal">—</div>
+        <div class="verdict-badge" id="verdict">—</div>
+
+        <div class="stats-mini">
+          <div class="stat-mini"><b id="totalMarks">0</b><small>Total marks</small></div>
+          <div class="stat-mini"><b id="subCount">0</b><small>Subjects</small></div>
+          <div class="stat-mini"><b id="gpaNo4">—</b><small>Without 4th</small></div>
+          <div class="stat-mini"><b id="bestSub">—</b><small>Best subject</small></div>
+        </div>
+
+        <!-- scale inside result -->
+        <div class="scale-box">
+          <h4>Grading scale</h4>
+          <div class="scale-item"><span>80 to 100 percent</span><b>A+ (5.00)</b></div>
+          <div class="scale-item"><span>70 to 79 percent</span><b>A (4.00)</b></div>
+          <div class="scale-item"><span>60 to 69 percent</span><b>A- (3.50)</b></div>
+          <div class="scale-item"><span>50 to 59 percent</span><b>B (3.00)</b></div>
+          <div class="scale-item"><span>40 to 49 percent</span><b>C (2.25)</b></div>
+          <div class="scale-item"><span>33 to 39 percent</span><b>D (2.00)</b></div>
+          <div class="scale-item"><span>0 to 32 percent</span><b>F (0.00)</b></div>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <script>
-    // ---------- SUBJECT DATA ----------
-    const defaultSubjects = [
-      {name:"Bangla (1st + 2nd)", parts:["1st Paper","2nd Paper"], max:[100,100]},
-      {name:"English (1st + 2nd)", parts:["1st Paper","2nd Paper"], max:[100,100]},
-      {name:"Mathematics", parts:["Marks"], max:[100]},
-      {name:"Physics", parts:["Marks"], max:[100]},
-      {name:"Chemistry", parts:["Marks"], max:[100]},
-      {name:"Biology", parts:["Marks"], max:[100]},
-      {name:"Higher Math", parts:["Marks"], max:[100]},
-      {name:"ICT", parts:["Marks"], max:[50]},
-      {name:"Bangladesh & Global Studies", parts:["Marks"], max:[100]},
-      {name:"Islam & Moral Education", parts:["Marks"], max:[100]},
-      {name:"Physical Education", parts:["Marks"], max:[50]},
-      {name:"Career & Life Skills", parts:["Marks"], max:[50]},
-    ];
+  <!-- FOOTER with Telegram and Email -->
+  <div class="foot-note">
+    Reference only, verify with your board. Bangla and English combined into one grade.
+    4th subject bonus: (point minus 2) divided by 2 added when above D.<br><br>
+    <span class="highlight">Join our Telegram group:</span>
+    <a href="https://t.me/ctins_community" target="_blank" rel="noopener">t.me/ctins_community</a><br>
+    <span class="highlight">Report issues by email:</span>
+    <a href="mailto:critical.thinking.institution@gmail.com">critical.thinking.institution@gmail.com</a>
+</div>
+</div>
 
-    let subjects = JSON.parse(JSON.stringify(defaultSubjects));
-    let optionalName = "Higher Math";   // 4th subject by default
+<script>
+  // ---------- SUBJECT DATA ----------
+  const defaultSubjects = [
+    { name: "Bangla (1st+2nd)", parts: ["1st", "2nd"], max: [100, 100] },
+    { name: "English (1st+2nd)", parts: ["1st", "2nd"], max: [100, 100] },
+    { name: "Mathematics", parts: ["Marks"], max: [100] },
+    { name: "Physics", parts: ["Marks"], max: [100] },
+    { name: "Chemistry", parts: ["Marks"], max: [100] },
+    { name: "Biology", parts: ["Marks"], max: [100] },
+    { name: "Higher Math", parts: ["Marks"], max: [100] },
+    { name: "ICT", parts: ["Marks"], max: [50] },
+    { name: "Bangladesh and Global", parts: ["Marks"], max: [100] },
+    { name: "Islam and Moral Edu", parts: ["Marks"], max: [100] },
+    { name: "Physical Education", parts: ["Marks"], max: [50] },
+    { name: "Career and Life Skills", parts: ["Marks"], max: [50] },
+  ];
 
-    const optionalIdx = () => subjects.findIndex(s => s.name === optionalName);
+  let subjects = JSON.parse(JSON.stringify(defaultSubjects));
+  let optionalName = "Higher Math";   // default 4th subject
 
-    // ---------- GRADING FUNCTION ----------
-    function gradeInfo(pct) {
-      if (pct >= 80) return {g:"A+", p:5.00, cls:"g5"};
-      if (pct >= 70) return {g:"A",  p:4.00, cls:"g4"};
-      if (pct >= 60) return {g:"A−", p:3.50, cls:"g35"};
-      if (pct >= 50) return {g:"B",  p:3.00, cls:"g3"};
-      if (pct >= 40) return {g:"C",  p:2.25, cls:"g225"};
-      if (pct >= 33) return {g:"D",  p:2.00, cls:"g2"};
-      return {g:"F", p:0.00, cls:"g0"};
+  const optionalIdx = () => subjects.findIndex(s => s.name === optionalName);
+
+  // ---------- GRADE FUNCTION ----------
+  function gradeInfo(pct) {
+    if (pct >= 80) return { g: "A+", p: 5.00, cls: "g5" };
+    if (pct >= 70) return { g: "A", p: 4.00, cls: "g4" };
+    if (pct >= 60) return { g: "A-", p: 3.50, cls: "g35" };
+    if (pct >= 50) return { g: "B", p: 3.00, cls: "g3" };
+    if (pct >= 40) return { g: "C", p: 2.25, cls: "g225" };
+    if (pct >= 33) return { g: "D", p: 2.00, cls: "g2" };
+    return { g: "F", p: 0.00, cls: "g0" };
+  }
+
+  // ---------- CLAMP INPUT TO MAX ----------
+  function clampInput(el, max) {
+    let val = parseFloat(el.value);
+    if (isNaN(val)) {
+      el.value = "";
+      return;
     }
+    if (val < 0) el.value = 0;
+    else if (val > max) el.value = max;
+  }
 
-    // ---------- RENDER SUBJECT ROWS ----------
-    function render() {
-      const tb = document.getElementById("subjectRows");
-      tb.innerHTML = "";
+  // ---------- RENDER SUBJECT ROWS ----------
+  function render() {
+    const tb = document.getElementById("subjectRows");
+    tb.innerHTML = "";
 
-      subjects.forEach((s, i) => {
-        const tr = document.createElement("tr");
+    subjects.forEach((s, i) => {
+      const tr = document.createElement("tr");
+      const isOpt = (s.name === optionalName);
+      const optBadge = isOpt ? ' <span class="opt-tag">4TH</span>' : '';
 
-        // badge for 4th subject
-        const isOpt = (s.name === optionalName);
-        const optBadge = isOpt ? ' <span class="opt-tag">4TH</span>' : '';
-
-        // build input boxes
-        let inputs = "";
-        s.parts.forEach((p, j) => {
-          inputs += `<input type="number" min="0" max="${s.max[j]}" placeholder="${s.max[j]}" id="m${i}_${j}" oninput="liveGrade(${i})">`;
-        });
-
-        const totalMax = s.max.reduce((a, b) => a + b, 0);
-
-        tr.innerHTML = `
-          <td class="subname"><span class="dot"></span>${s.name}${optBadge}</td>
-          <td>
-            <div class="marks-box">
-              ${inputs}
-              <span class="max-tag">/${totalMax}</span>
-            </div>
-          </td>
-          <td><span class="grade-pill g3" id="g${i}">—</span></td>
-        `;
-        tb.appendChild(tr);
-      });
-    }
-
-    // ---------- GET SUBJECT PERCENTAGE ----------
-    function getSubjectPct(i) {
-      const s = subjects[i];
-      let obtained = 0;
-      let max = 0;
-      let any = false;
-
+      let inputs = "";
       s.parts.forEach((p, j) => {
-        const el = document.getElementById(`m${i}_${j}`);
-        if (!el) return;
-        const v = el.value;
-        if (v !== "") {
-          any = true;
-          obtained += Math.max(0, Math.min(s.max[j], parseFloat(v) || 0));
-        }
-        max += s.max[j];
+        inputs += `<input type="number" min="0" max="${s.max[j]}" placeholder="${s.max[j]}" id="m${i}_${j}"
+          oninput="clampInput(this, ${s.max[j]}); liveGrade(${i})">`;
       });
 
-      if (!any) return { pct: null, obtained, max, filled: false };
-      return { pct: (obtained / max) * 100, obtained, max, filled: true };
+      const totalMax = s.max.reduce((a, b) => a + b, 0);
+
+      tr.innerHTML = `
+        <td class="subject-name">${s.name}${optBadge}</td>
+        <td>
+          <div class="marks-wrap">
+            ${inputs}
+            <span class="max-tag">out of ${totalMax}</span>
+          </div>
+        </td>
+        <td><span class="grade-pill g3" id="g${i}">—</span></td>
+      `;
+      tb.appendChild(tr);
+    });
+  }
+
+  // ---------- GET SUBJECT PERCENTAGE ----------
+  function getSubjectPct(i) {
+    const s = subjects[i];
+    let obtained = 0;
+    let max = 0;
+    let any = false;
+
+    s.parts.forEach((p, j) => {
+      const el = document.getElementById(`m${i}_${j}`);
+      if (!el) return;
+      const v = el.value;
+      if (v !== "") {
+        any = true;
+        let num = parseFloat(v) || 0;
+        if (num < 0) num = 0;
+        if (num > s.max[j]) num = s.max[j];
+        obtained += num;
+      }
+      max += s.max[j];
+    });
+
+    if (!any) return { pct: null, obtained, max, filled: false };
+    return { pct: (obtained / max) * 100, obtained, max, filled: true };
+  }
+
+  // ---------- LIVE GRADE UPDATE ----------
+  function liveGrade(i) {
+    const pill = document.getElementById("g" + i);
+    const r = getSubjectPct(i);
+
+    if (r.pct === null) {
+      pill.textContent = "—";
+      pill.className = "grade-pill g3";
+      return;
     }
 
-    // ---------- LIVE GRADE UPDATE ----------
-    function liveGrade(i) {
-      const pill = document.getElementById("g" + i);
-      const r = getSubjectPct(i);
+    const gi = gradeInfo(r.pct);
+    pill.textContent = `${gi.g} (${gi.p.toFixed(2)})`;
+    pill.className = `grade-pill ${gi.cls}`;
+  }
 
-      if (r.pct === null) {
-        pill.textContent = "—";
-        pill.className = "grade-pill g3";
-        return;
-      }
+  // ---------- CALCULATE ----------
+  function calculate() {
+    const oIdx = optionalIdx();
+    const isOpt = oIdx !== -1;
+
+    let total = 0;
+    let maxTotal = 0;
+    let count = 0;
+    let countNo4 = 0;
+    let sumNo4 = 0;
+    let bestPct = -1;
+    let bestName = "";
+    let fail = false;
+
+    const rows = [];
+
+    subjects.forEach((_, i) => {
+      const r = getSubjectPct(i);
+      if (!r.filled) return;
 
       const gi = gradeInfo(r.pct);
-      pill.textContent = `${gi.g} (${gi.p.toFixed(2)})`;
-      pill.className = `grade-pill ${gi.cls}`;
+      rows.push({ i, pct: r.pct, p: gi.p });
+
+      total += r.obtained;
+      maxTotal += r.max;
+      count++;
+
+      if (r.pct > bestPct) {
+        bestPct = r.pct;
+        bestName = subjects[i].name;
+      }
+      if (gi.g === "F") fail = true;
+    });
+
+    if (count === 0) {
+      alert("Please enter marks for at least one subject.");
+      return;
     }
 
-    // ---------- CALCULATE GPA ----------
-    function calculate() {
-      const oIdx = optionalIdx();
-      const isOpt = oIdx !== -1;
-
-      let total = 0;
-      let maxTotal = 0;
-      let count = 0;
-      let countNo4 = 0;
-      let sumNo4 = 0;
-      let bestPct = -1;
-      let bestName = "";
-      let fail = false;
-
-      const rows = [];
-
-      // gather filled subjects
-      subjects.forEach((_, i) => {
-        const r = getSubjectPct(i);
-        if (!r.filled) return;
-
-        const gi = gradeInfo(r.pct);
-        rows.push({ i, pct: r.pct, p: gi.p });
-
-        total += r.obtained;
-        maxTotal += r.max;
-        count++;
-
-        if (r.pct > bestPct) {
-          bestPct = r.pct;
-          bestName = subjects[i].name;
-        }
-        if (gi.g === "F") fail = true;
-      });
-
-      if (count === 0) {
-        alert("Please enter marks for at least one subject!");
-        return;
-      }
-
-      // calculate sum with 4th subject bonus (only if 4th is filled)
-      let sum = 0;
-      rows.forEach(r => {
-        if (isOpt && r.i === oIdx) {
-          // 4th subject: only count if point > 2 (bonus)
-          if (r.p > 2.00) sum += (r.p - 2) / 2;
-          // else contributes 0 — but we still count it as subject? No: handled below
-        } else {
-          sum += r.p;
-          sumNo4 += r.p;
-          countNo4++;
-        }
-      });
-
-      // how many subjects actually counted for GPA?
-      const fourthFilled = isOpt && rows.some(r => r.i === oIdx);
-      const n = fourthFilled ? count - 1 : count;  // exclude 4th from divisor if present
-
-      const gpa = fail ? 0 : Math.min(5.00, sum / n);
-      const gpaNo4 = countNo4 ? Math.min(5.00, sumNo4 / countNo4) : NaN;
-
-      const overall = gradeInfo(fail ? 0 : gpa * 20);   // gpa*20 = percentage equivalent
-
-      // update UI
-      document.getElementById("emptyMsg").classList.add("hidden");
-      document.getElementById("resBody").classList.remove("hidden");
-
-      document.getElementById("gpaVal").textContent = gpa.toFixed(2);
-      document.getElementById("gradeVal").textContent = fail ? "F ❌" : overall.g + " ✅";
-      document.getElementById("totalMarks").textContent = total + "/" + maxTotal;
-      document.getElementById("subCount").textContent = count;
-      document.getElementById("gpaNo4").textContent = isNaN(gpaNo4) ? "—" : gpaNo4.toFixed(2);
-
-      const bestShort = bestName.split("(")[0].trim();
-      document.getElementById("bestSub").textContent = `${bestShort} (${bestPct.toFixed(0)}%)`;
-
-      // verdict styling
-      const vd = document.getElementById("verdict");
-      vd.style.background = "rgba(95, 224, 139, 0.15)";
-      vd.style.color = "#a8ffc5";
-      vd.style.borderColor = "rgba(95, 224, 139, 0.4)";
-
-      if (fail) {
-        vd.textContent = "❌ Failed (F grade present)";
-        vd.style.background = "rgba(255, 123, 123, 0.15)";
-        vd.style.color = "#ffc0c0";
-        vd.style.borderColor = "rgba(255, 123, 123, 0.5)";
-      } else if (gpa >= 5.00) {
-        vd.textContent = "🏆 Golden GPA — Congratulations!";
-      } else if (gpa >= 4.00) {
-        vd.textContent = "🎉 Excellent Result!";
-      } else if (gpa >= 3.00) {
-        vd.textContent = "👍 Good Result!";
+    // GPA calculation with 4th subject bonus
+    let sum = 0;
+    rows.forEach(r => {
+      if (isOpt && r.i === oIdx) {
+        if (r.p > 2.00) sum += (r.p - 2) / 2;
       } else {
-        vd.textContent = "💪 Keep trying, you can do better!";
-        vd.style.background = "rgba(255, 190, 60, 0.15)";
-        vd.style.color = "#ffe5a3";
-        vd.style.borderColor = "rgba(255, 190, 60, 0.4)";
+        sum += r.p;
+        sumNo4 += r.p;
+        countNo4++;
       }
+    });
 
+    const fourthFilled = isOpt && rows.some(r => r.i === oIdx);
+    const n = fourthFilled ? count - 1 : count;
+
+    const gpa = fail ? 0 : Math.min(5.00, sum / n);
+    const gpaNo4 = countNo4 ? Math.min(5.00, sumNo4 / countNo4) : NaN;
+
+    const overall = gradeInfo(fail ? 0 : gpa * 20);
+
+    // ----- update UI -----
+    document.getElementById("emptyMsg").classList.add("hidden");
+    document.getElementById("resBody").classList.remove("hidden");
+
+    document.getElementById("gpaVal").textContent = gpa.toFixed(2);
+    document.getElementById("gradeVal").textContent = fail ? "F" : overall.g;
+    document.getElementById("totalMarks").textContent = total + " / " + maxTotal;
+    document.getElementById("subCount").textContent = count;
+    document.getElementById("gpaNo4").textContent = isNaN(gpaNo4) ? "—" : gpaNo4.toFixed(2);
+
+    const bestShort = bestName.split("(")[0].trim();
+    document.getElementById("bestSub").textContent = `${bestShort} (${bestPct.toFixed(0)}%)`;
+
+    // verdict
+    const vd = document.getElementById("verdict");
+    vd.style.background = "#0d2318";
+    vd.style.color = "#6ee7a0";
+    vd.style.borderColor = "#1b3d2a";
+
+    if (fail) {
+      vd.textContent = "Failed (F present)";
+      vd.style.background = "#241010";
+      vd.style.color = "#ff7b7b";
+      vd.style.borderColor = "#3d1a1a";
+    } else if (gpa >= 5.00) {
+      vd.textContent = "Golden GPA perfect";
+    } else if (gpa >= 4.00) {
+      vd.textContent = "Excellent result";
+    } else if (gpa >= 3.00) {
+      vd.textContent = "Good result";
+    } else {
+      vd.textContent = "Keep pushing";
+      vd.style.background = "#241a0a";
+      vd.style.color = "#ffbe5c";
+      vd.style.borderColor = "#3d2e12";
+    }
+
+    if (window.innerWidth < 780) {
       document.getElementById("resBody").scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
+  }
 
-    // ---------- RESET ----------
-    function resetAll() {
-      subjects = JSON.parse(JSON.stringify(defaultSubjects));
-      optionalName = "Higher Math";
-      document.getElementById("optSelect").value = "Higher Math";
-      render();
-      document.getElementById("resBody").classList.add("hidden");
-      document.getElementById("emptyMsg").classList.remove("hidden");
-    }
-
-    // ---------- ADD SUBJECT ----------
-    function addSubject() {
-      const name = prompt("Enter the new subject name:", "Extra Subject");
-      if (name && name.trim()) {
-        const mk = prompt("Full marks of this subject?", "100");
-        const max = Math.max(1, parseInt(mk) || 100);
-        subjects.push({ name: name.trim(), parts: ["Marks"], max: [max] });
-        render();
-      }
-    }
-
-    // ---------- INITIAL RENDER ----------
+  // ---------- RESET ----------
+  function resetAll() {
+    subjects = JSON.parse(JSON.stringify(defaultSubjects));
+    optionalName = "Higher Math";
+    document.getElementById("optSelect").value = "Higher Math";
     render();
-  </script>
+    document.getElementById("resBody").classList.add("hidden");
+    document.getElementById("emptyMsg").classList.remove("hidden");
+  }
+
+  // ---------- ADD SUBJECT ----------
+  function addSubject() {
+    const name = prompt("Subject name:", "Extra subject");
+    if (!name || !name.trim()) return;
+    const mk = prompt("Full marks?", "100");
+    const max = Math.max(1, parseInt(mk) || 100);
+    subjects.push({ name: name.trim(), parts: ["Marks"], max: [max] });
+    render();
+  }
+
+  // ---------- INIT ----------
+  render();
+</script>
 </body>
 </html>
