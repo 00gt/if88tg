@@ -1,842 +1,686 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SSC GPA Calculator</title>
-  <style>
-    /* ---------- DARK MINIMAL ---------- */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SSC GPA Calculator</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter','Segoe UI',system-ui,-apple-system,sans-serif; }
+:root {
+--bg:#0a0c10; --card:#0f131a; --card2:#0a0e14; --border:#1e2633;
+--border2:#232c3d; --text:#e8edf5; --muted:#5e6f8d; --muted2:#4f5f78;
+--accent:#7aa2ff; --shadow:rgba(74,122,255,.12);
+}
 
-    body {
-      background: #0a0c10;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 1.5rem 1rem;
-      color: #e8edf5;
-    }
+body.light {
+--bg:#f2f5fa; --card:#ffffff; --card2:#eef1f7; --border:#e1e6ef;
+--border2:#d5dcea; --text:#1a2233; --muted:#5e6f8d; --muted2:#8391a8;
+--accent:#3d6bff; --shadow:rgba(61,107,255,.10);
+}
 
-    .app {
-      max-width: 1100px;
-      width: 100%;
-      margin: 0 auto;
-    }
+body {
+background:var(--bg); min-height:100vh; padding:1.5rem 1rem;
+color:var(--text); transition:background .25s,color .25s;
+}
+.app { max-width:1150px; width:100%; margin:0 auto; }
 
-    /* ----- HEADER ----- */
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      margin-bottom: 2rem;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
+/* HEADER */
+.header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.6rem; flex-wrap:wrap; gap:1rem; }
+.header-left h1 { font-size:2rem; font-weight:800; letter-spacing:-.03em; color:var(--text); }
+.header-left h1 span { color:var(--accent); }
+.header-left p { color:var(--muted); font-size:.85rem; margin-top:.2rem; }
+.header-right { display:flex; gap:.5rem; align-items:center; }
+.badge { background:var(--card2); border-radius:100px; padding:.45rem 1rem; font-size:.7rem; font-weight:600; color:var(--accent); border:1px solid var(--border2); white-space:nowrap; cursor:pointer; user-select:none; }
+.badge:hover { border-color:var(--accent); }
 
-    .header-left h1 {
-      font-size: 2rem;
-      font-weight: 700;
-      letter-spacing: -0.03em;
-      color: #f0f4fa;
-    }
+/* GRID */
+.grid { display:grid; grid-template-columns:1.45fr 1fr; gap:1.5rem; align-items:start; }
+@media (max-width:820px){ .grid{ grid-template-columns:1fr; gap:1.25rem; } }
 
-    .header-left h1 span {
-      color: #7aa2ff;
-    }
+.card { background:var(--card); border-radius:24px; padding:1.8rem 1.6rem; border:1px solid var(--border); transition:border-color .15s; }
+.card:hover { border-color:var(--border2); }
+.card-title { font-size:1.05rem; font-weight:600; color:var(--text); display:flex; align-items:center; gap:.5rem; margin-bottom:1.4rem; padding-bottom:.7rem; border-bottom:1px solid var(--border); justify-content:space-between; }
+.card-title .mini-actions { display:flex; gap:.4rem; }
+.chip { font-size:.62rem; font-weight:600; padding:.35rem .8rem; border-radius:30px; background:var(--card2); border:1px solid var(--border2); color:var(--muted); cursor:pointer; transition:.12s; white-space:nowrap; }
+.chip:hover { color:var(--text); border-color:var(--accent); }
 
-    .header-left p {
-      color: #5e6f8d;
-      font-size: 0.85rem;
-      margin-top: 0.2rem;
-      font-weight: 400;
-    }
+/* OPT ROW */
+.opt-row { display:flex; align-items:center; gap:.75rem; background:var(--card2); border:1px solid var(--border); border-radius:16px; padding:.6rem 1rem; margin-bottom:1.2rem; flex-wrap:wrap; }
+.opt-row label { font-size:.8rem; font-weight:600; color:var(--muted); white-space:nowrap; }
+.opt-row select { flex:1; min-width:150px; background:transparent; border:none; padding:.5rem .2rem; font-size:.9rem; font-weight:500; color:var(--text); outline:none; cursor:pointer; appearance:none;
+background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%235e6f8d' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+background-repeat:no-repeat; background-position:right .5rem center; background-size:14px; }
+.opt-row select option { background:var(--card); color:var(--text); }
 
-    .badge {
-      background: #141a24;
-      border-radius: 100px;
-      padding: 0.4rem 1rem;
-      font-size: 0.7rem;
-      font-weight: 600;
-      letter-spacing: 0.04em;
-      color: #7aa2ff;
-      border: 1px solid #232c3d;
-      white-space: nowrap;
-    }
+/* TABLE */
+table { width:100%; border-collapse:collapse; font-size:.85rem; }
+th { text-align:left; font-weight:600; font-size:.6rem; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); padding:.5rem .2rem; border-bottom:1px solid var(--border); }
+td { padding:.55rem .2rem; border-bottom:1px solid var(--border); vertical-align:middle; }
+tr:last-child td { border-bottom:none; }
+tr.removable:hover .del-btn { opacity:1; }
+.subject-name { font-weight:500; color:var(--text); display:flex; align-items:center; gap:.4rem; flex-wrap:wrap; }
+.opt-tag { font-size:.55rem; font-weight:700; background:var(--card2); color:var(--accent); padding:.15rem .5rem; border-radius:20px; border:1px solid var(--border2); white-space:nowrap; }
+.fail-tag { font-size:.55rem; font-weight:700; background:#241010; color:#ff7b7b; padding:.15rem .5rem; border-radius:20px; border:1px solid #3d1a1a; white-space:nowrap; }
+body.light .fail-tag { background:#fdeaea; }
 
-    /* ----- GRID ----- */
-    .grid {
-      display: grid;
-      grid-template-columns: 1.4fr 1fr;
-      gap: 1.5rem;
-      align-items: start;
-    }
+.marks-wrap { display:flex; align-items:center; gap:.3rem; flex-wrap:wrap; }
+.marks-wrap input { width:64px; border:1px solid var(--border2); border-radius:10px; padding:.45rem .3rem; font-size:.85rem; font-weight:600; text-align:center; color:var(--text); background:var(--card2); outline:none; transition:.12s; -moz-appearance:textfield; }
+.marks-wrap input::-webkit-outer-spin-button,.marks-wrap input::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
+.marks-wrap input:focus { border-color:var(--accent); box-shadow:0 0 0 3px var(--shadow); }
+.marks-wrap input::placeholder { color:var(--muted2); font-weight:400; font-size:.75rem; }
+.max-tag { font-size:.6rem; color:var(--muted2); font-weight:500; white-space:nowrap; }
 
-    @media (max-width: 780px) {
-      .grid {
-        grid-template-columns: 1fr;
-        gap: 1.25rem;
-      }
-      .header {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-    }
+/* progress bar per subject */
+.subj-bar { height:3px; border-radius:3px; background:var(--border); margin-top:.35rem; overflow:hidden; max-width:160px; }
+.subj-bar i { display:block; height:100%; width:0%; border-radius:3px; background:var(--accent); transition:width .3s, background .3s; }
 
-    /* ----- CARDS ----- */
-    .card {
-      background: #0f131a;
-      border-radius: 24px;
-      padding: 1.8rem 1.6rem;
-      border: 1px solid #1e2633;
-      transition: 0.15s ease;
-    }
+.del-btn { opacity:0; margin-left:.3rem; border:none; background:transparent; color:var(--muted2); cursor:pointer; font-size:.9rem; padding:.1rem .3rem; border-radius:6px; transition:.12s; }
+.del-btn:hover { color:#ff7b7b; background:rgba(255,123,123,.08); }
 
-    .card:hover {
-      border-color: #2a3548;
-    }
+/* GRADE PILLS */
+.grade-pill { display:inline-block; min-width:60px; text-align:center; font-weight:700; font-size:.7rem; padding:.25rem .6rem; border-radius:30px; background:var(--card2); color:var(--muted); border:1px solid var(--border2); transition:.15s; }
+.g5{background:#0d2318;color:#6ee7a0;border-color:#1b3d2a} .g4{background:#0e1a2e;color:#7aa2ff;border-color:#1e3050}
+.g35{background:#1a122e;color:#b794ff;border-color:#2e224a} .g3{background:#241a0a;color:#ffbe5c;border-color:#3d2e12}
+.g225{background:#24140e;color:#ff9a6b;border-color:#3d2012} .g2{background:#241010;color:#ff7b7b;border-color:#3d1a1a}
+.g0{background:#2a0e0e;color:#ff5e5e;border-color:#4a1616;font-weight:800}
+body.light .g5{background:#e2f7ea} body.light .g4{background:#e6eeff} body.light .g35{background:#f0e8ff}
+body.light .g3{background:#fff3dd} body.light .g225{background:#ffe9dd} body.light .g2{background:#fdeaea} body.light .g0{background:#fdd}
 
-    .card-title {
-      font-size: 1.05rem;
-      font-weight: 600;
-      letter-spacing: -0.01em;
-      color: #dbe3f0;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      margin-bottom: 1.4rem;
-      padding-bottom: 0.7rem;
-      border-bottom: 1px solid #1e2633;
-    }
+/* BUTTONS */
+.actions { display:flex; gap:.6rem; margin-top:1.6rem; flex-wrap:wrap; }
+.btn { cursor:pointer; border-radius:40px; font-weight:600; font-size:.8rem; padding:.7rem 1.4rem; transition:.12s; display:inline-flex; align-items:center; gap:.4rem; background:var(--card2); border:1px solid var(--border2); color:var(--text); }
+.btn-primary { background:#1e2e52; border-color:#2a3f6b; color:#e8edf5; }
+body.light .btn-primary { background:var(--accent); border-color:var(--accent); color:#fff; }
+.btn-primary:hover { filter:brightness(1.15); }
+.btn:hover { border-color:var(--accent); }
 
-    /* ----- 4th subject selector ----- */
-    .opt-row {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      background: #0a0e14;
-      border: 1px solid #1e2633;
-      border-radius: 16px;
-      padding: 0.6rem 1rem;
-      margin-bottom: 1.5rem;
-    }
+/* RESULT */
+.result-card { display:flex; flex-direction:column; height:100%; position:sticky; top:1rem; }
+@media (max-width:820px){ .result-card{ position:static; } }
+.result-empty { color:var(--muted2); font-size:.85rem; text-align:center; padding:2rem .5rem; line-height:1.7; border-radius:18px; background:var(--card2); border:1px dashed var(--border); }
+.result-empty strong { color:var(--accent); font-weight:600; }
 
-    .opt-row label {
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: #a0b2d0;
-      white-space: nowrap;
-    }
+/* gauge */
+.gauge-wrap { display:flex; flex-direction:column; align-items:center; padding:.5rem 0 .2rem; }
+.gauge { position:relative; width:170px; height:170px; }
+.gauge svg { transform:rotate(-90deg); }
+.gauge .track { fill:none; stroke:var(--border); stroke-width:12; }
+.gauge .arc { fill:none; stroke:var(--accent); stroke-width:12; stroke-linecap:round; transition:stroke-dashoffset .8s cubic-bezier(.4,0,.2,1), stroke .4s; }
+.gauge-center { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.gpa-large { font-size:2.6rem; font-weight:800; line-height:1; color:var(--text); letter-spacing:-.04em; }
+.gpa-sub { font-size:.58rem; letter-spacing:.12em; text-transform:uppercase; color:var(--muted2); font-weight:600; margin-top:.25rem; }
+.grade-large { font-size:1.3rem; font-weight:700; text-align:center; margin-top:.6rem; color:var(--text); }
 
-    .opt-row select {
-      flex: 1;
-      background: transparent;
-      border: none;
-      padding: 0.5rem 0.2rem;
-      font-size: 0.9rem;
-      font-weight: 500;
-      color: #e8edf5;
-      outline: none;
-      cursor: pointer;
-      appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%235e6f8d' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 0.5rem center;
-      background-size: 14px;
-    }
+.verdict-badge { display:inline-block; margin:.4rem auto 0; padding:.4rem 1.2rem; border-radius:40px; font-size:.75rem; font-weight:600; background:#0d2318; color:#6ee7a0; border:1px solid #1b3d2a; text-align:center; align-self:center; transition:.2s; }
+body.light .verdict-badge.pass { background:#e2f7ea; color:#1f8a4c; border-color:#b5e6c8; }
+.verdict-badge.fail { background:#241010; color:#ff7b7b; border-color:#3d1a1a; }
+body.light .verdict-badge.fail { background:#fdeaea; color:#d33; border-color:#f3c1c1; }
+.verdict-badge.mid { background:#241a0a; color:#ffbe5c; border-color:#3d2e12; }
+body.light .verdict-badge.mid { background:#fff3dd; color:#b8860b; border-color:#f0dcae; }
 
-    .opt-row select option {
-      background: #0f131a;
-      color: #e8edf5;
-    }
+.stats-mini { display:grid; grid-template-columns:1fr 1fr; gap:.6rem; margin-top:1.4rem; }
+.stat-mini { background:var(--card2); border-radius:16px; padding:.9rem .5rem; text-align:center; border:1px solid var(--border); }
+.stat-mini b { display:block; font-size:1.05rem; font-weight:700; color:var(--text); margin-bottom:.1rem; }
+.stat-mini small { font-size:.55rem; text-transform:uppercase; letter-spacing:.06em; color:var(--muted2); font-weight:500; }
 
-    /* ----- TABLE ----- */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.85rem;
-    }
+/* CHART */
+.chart-box { margin-top:1.4rem; background:var(--card2); border-radius:18px; padding:1rem 1.1rem; border:1px solid var(--border); }
+.chart-box h4 { font-size:.6rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted2); margin-bottom:.7rem; font-weight:600; }
+.chart-row { display:flex; align-items:center; gap:.6rem; margin-bottom:.45rem; font-size:.68rem; }
+.chart-row:last-child { margin-bottom:0; }
+.chart-row .cname { width:38%; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-weight:500; }
+.chart-row .cbar { flex:1; height:8px; background:var(--border); border-radius:8px; overflow:hidden; }
+.chart-row .cbar i { display:block; height:100%; width:0%; border-radius:8px; background:var(--accent); transition:width .7s cubic-bezier(.4,0,.2,1), background .3s; }
+.chart-row .cval { width:36px; text-align:right; font-weight:700; color:var(--text); font-size:.68rem; }
 
-    th {
-      text-align: left;
-      font-weight: 600;
-      font-size: 0.6rem;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: #5e6f8d;
-      padding: 0.5rem 0.2rem;
-      border-bottom: 1px solid #1e2633;
-    }
+/* SCALE */
+.scale-box { margin-top:1.2rem; background:var(--card2); border-radius:18px; padding:1rem 1.2rem; border:1px solid var(--border); }
+.scale-box h4 { font-size:.6rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted2); margin-bottom:.6rem; font-weight:600; }
+.scale-item { display:flex; justify-content:space-between; font-size:.75rem; padding:.25rem 0; border-bottom:1px solid var(--border); color:var(--muted); }
+.scale-item:last-child { border-bottom:none; }
+.scale-item b { font-weight:700; color:var(--text); }
 
-    td {
-      padding: 0.55rem 0.2rem;
-      border-bottom: 1px solid #161c26;
-      vertical-align: middle;
-    }
+/* TOAST */
+#toast { position:fixed; bottom:1.4rem; left:50%; transform:translate(-50%,150%); background:var(--card); color:var(--text); border:1px solid var(--border2); padding:.8rem 1.4rem; border-radius:40px; font-size:.82rem; font-weight:600; transition:transform .35s cubic-bezier(.4,0,.2,1); z-index:99; box-shadow:0 10px 40px rgba(0,0,0,.35); }
+#toast.show { transform:translate(-50%,0); }
 
-    tr:last-child td {
-      border-bottom: none;
-    }
+/* FOOTER */
+.foot-note { margin-top:1.5rem; font-size:.7rem; color:var(--muted); text-align:center; line-height:1.8; border-top:1px solid var(--border); padding-top:1.2rem; }
+.foot-note a { color:var(--accent); text-decoration:none; font-weight:500; }
+.foot-note a:hover { text-decoration:underline; }
+.foot-note .highlight { color:var(--accent); font-weight:600; }
 
-    .subject-name {
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      flex-wrap: wrap;
-      color: #c8d4e6;
-    }
+.hidden { display:none !important; }
+::-webkit-scrollbar{width:6px} ::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:10px}
 
-    .opt-tag {
-      font-size: 0.55rem;
-      font-weight: 700;
-      background: #1a2332;
-      color: #7aa2ff;
-      padding: 0.15rem 0.5rem;
-      border-radius: 20px;
-      letter-spacing: 0.02em;
-      border: 1px solid #2a3a55;
-      white-space: nowrap;
-    }
+@media print {
+body{ background:#fff; color:#111; padding:0 }
+.card{ border:1px solid #ccc }
+.actions,.header-right,.foot-note,#toast{ display:none !important }
+}
+</style>
 
-    .marks-wrap {
-      display: flex;
-      align-items: center;
-      gap: 0.3rem;
-      flex-wrap: wrap;
-    }
-
-    .marks-wrap input {
-      width: 70px;
-      border: 1px solid #232c3d;
-      border-radius: 10px;
-      padding: 0.45rem 0.3rem;
-      font-size: 0.85rem;
-      font-weight: 600;
-      text-align: center;
-      color: #e8edf5;
-      background: #0a0e14;
-      outline: none;
-      transition: 0.12s;
-      -moz-appearance: textfield;
-    }
-
-    .marks-wrap input::-webkit-outer-spin-button,
-    .marks-wrap input::-webkit-inner-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
-
-    .marks-wrap input:focus {
-      border-color: #4a7aff;
-      box-shadow: 0 0 0 3px rgba(74, 122, 255, 0.12);
-    }
-
-    .marks-wrap input::placeholder {
-      color: #3f4d63;
-      font-weight: 400;
-      font-size: 0.75rem;
-    }
-
-    .max-tag {
-      font-size: 0.6rem;
-      color: #4f5f78;
-      font-weight: 500;
-      white-space: nowrap;
-    }
-
-    /* ----- GRADE PILLS (dark minimal) ----- */
-    .grade-pill {
-      display: inline-block;
-      min-width: 60px;
-      text-align: center;
-      font-weight: 700;
-      font-size: 0.7rem;
-      padding: 0.25rem 0.6rem;
-      border-radius: 30px;
-      background: #161c26;
-      color: #8a9bb8;
-      border: 1px solid #232c3d;
-      transition: 0.1s;
-    }
-
-    .g5 { background: #0d2318; color: #6ee7a0; border-color: #1b3d2a; }
-    .g4 { background: #0e1a2e; color: #7aa2ff; border-color: #1e3050; }
-    .g35 { background: #1a122e; color: #b794ff; border-color: #2e224a; }
-    .g3 { background: #241a0a; color: #ffbe5c; border-color: #3d2e12; }
-    .g225 { background: #24140e; color: #ff9a6b; border-color: #3d2012; }
-    .g2 { background: #241010; color: #ff7b7b; border-color: #3d1a1a; }
-    .g0 { background: #2a0e0e; color: #ff5e5e; border-color: #4a1616; font-weight: 800; }
-
-    /* ----- BUTTONS ----- */
-    .actions {
-      display: flex;
-      gap: 0.6rem;
-      margin-top: 1.6rem;
-      flex-wrap: wrap;
-    }
-
-    .btn {
-      cursor: pointer;
-      border-radius: 40px;
-      font-weight: 600;
-      font-size: 0.8rem;
-      padding: 0.7rem 1.4rem;
-      transition: 0.12s;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.4rem;
-      background: #0a0e14;
-      border: 1px solid #232c3d;
-      color: #c8d4e6;
-      letter-spacing: 0.01em;
-    }
-
-    .btn-primary {
-      background: #1e2e52;
-      border-color: #2a3f6b;
-      color: #e8edf5;
-    }
-
-    .btn-primary:hover {
-      background: #263a66;
-      border-color: #3a5590;
-    }
-
-    .btn:hover {
-      background: #141a24;
-      border-color: #2e3a4f;
-      color: #e8edf5;
-    }
-
-    /* ----- RESULT SIDE (dark minimal) ----- */
-    .result-card {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-    }
-
-    .result-empty {
-      color: #4f5f78;
-      font-size: 0.85rem;
-      text-align: center;
-      padding: 2rem 0.5rem;
-      line-height: 1.7;
-      border-radius: 18px;
-      background: #0a0e14;
-      border: 1px dashed #1e2633;
-    }
-
-    .result-empty strong {
-      color: #7aa2ff;
-      font-weight: 600;
-    }
-
-    .gpa-large {
-      font-size: 4rem;
-      font-weight: 800;
-      line-height: 1;
-      color: #f0f4fa;
-      letter-spacing: -0.04em;
-      margin: 0.5rem 0 0.2rem;
-      text-align: center;
-    }
-
-    .gpa-sub {
-      font-size: 0.7rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: #5e6f8d;
-      font-weight: 500;
-      text-align: center;
-    }
-
-    .grade-large {
-      font-size: 1.5rem;
-      font-weight: 700;
-      text-align: center;
-      margin: 0.6rem 0 0.1rem;
-      color: #f0f4fa;
-    }
-
-    .verdict-badge {
-      display: inline-block;
-      margin: 0.4rem auto 0;
-      padding: 0.4rem 1.2rem;
-      border-radius: 40px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      background: #0d2318;
-      color: #6ee7a0;
-      border: 1px solid #1b3d2a;
-      text-align: center;
-      align-self: center;
-    }
-
-    .stats-mini {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.6rem;
-      margin-top: 1.5rem;
-    }
-
-    .stat-mini {
-      background: #0a0e14;
-      border-radius: 16px;
-      padding: 0.9rem 0.5rem;
-      text-align: center;
-      border: 1px solid #1e2633;
-    }
-
-    .stat-mini b {
-      display: block;
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: #dbe3f0;
-      margin-bottom: 0.1rem;
-    }
-
-    .stat-mini small {
-      font-size: 0.55rem;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: #4f5f78;
-      font-weight: 500;
-    }
-
-    /* ----- SCALE (dark minimal) ----- */
-    .scale-box {
-      margin-top: 1.6rem;
-      background: #0a0e14;
-      border-radius: 18px;
-      padding: 1rem 1.2rem;
-      border: 1px solid #1e2633;
-    }
-
-    .scale-box h4 {
-      font-size: 0.6rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #4f5f78;
-      margin-bottom: 0.6rem;
-      font-weight: 600;
-    }
-
-    .scale-item {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.75rem;
-      padding: 0.25rem 0;
-      border-bottom: 1px solid #161c26;
-      color: #8a9bb8;
-    }
-
-    .scale-item:last-child {
-      border-bottom: none;
-    }
-
-    .scale-item b {
-      font-weight: 700;
-      color: #c8d4e6;
-    }
-
-    /* footer with telegram & email */
-    .foot-note {
-      margin-top: 1.5rem;
-      font-size: 0.7rem;
-      color: #5e6f8d;
-      text-align: center;
-      line-height: 1.8;
-      border-top: 1px solid #1e2633;
-      padding-top: 1.2rem;
-    }
-
-    .foot-note a {
-      color: #7aa2ff;
-      text-decoration: none;
-      font-weight: 500;
-      transition: color 0.15s;
-    }
-
-    .foot-note a:hover {
-      color: #a8c4ff;
-      text-decoration: underline;
-    }
-
-    .foot-note .highlight {
-      color: #7aa2ff;
-      font-weight: 600;
-    }
-
-    .foot-note .separator {
-      margin: 0 0.4rem;
-      color: #2a3548;
-    }
-
-    .hidden {
-      display: none !important;
-    }
-
-    /* scrollbar dark */
-    ::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: #0a0c10;
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: #1e2633;
-      border-radius: 10px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-      background: #2a3548;
-    }
-  </style>
 </head>
 <body>
 <div class="app">
-  <!-- HEADER -->
   <div class="header">
     <div class="header-left">
       <h1>SSC <span>GPA</span></h1>
-      <p>Session 2025–26</p>
+      <p>Session 2025–26 · Bangladesh Board (reference)</p>
     </div>
-    <div class="badge">dark mode</div>
+    <div class="header-right">
+      <div class="badge" onclick="fillSample()">⚡ Try sample</div>
+      <div class="badge" id="themeToggle" onclick="toggleTheme()">🌙 Theme</div>
+    </div>
   </div>
-
-  <!-- MAIN GRID -->
   <div class="grid">
-    <!-- LEFT CARD – INPUT -->
+    <!-- INPUT -->
     <div class="card">
-      <div class="card-title">Subjects and marks</div>
-
-      <!-- 4th subject -->
-      <div class="opt-row">
-        <label>4th subject</label>
-        <select id="optSelect" onchange="optionalName=this.value; render();">
-          <option value="Higher Math">Higher Math</option>
-          <option value="Biology">Biology</option>
-        </select>
+      <div class="card-title">
+        <span>Subjects and marks</span>
+        <span class="mini-actions">
+          <span class="chip" onclick="fillAllAplus()">All A+</span>
+          <span class="chip" onclick="printResult()">🖨 Print</span>
+          <span class="chip" onclick="copyResult()">📋 Copy</span>
+        </span>
       </div>
-
-      <!-- SUBJECT TABLE -->
-      <table>
-        <thead>
-          <tr>
-            <th>Subject</th>
-            <th style="width:140px">Marks</th>
-            <th style="width:70px">Grade</th>
-          </tr>
-        </thead>
-        <tbody id="subjectRows"></tbody>
-      </table>
-
-      <!-- ACTIONS -->
-      <div class="actions">
-        <button class="btn btn-primary" onclick="calculate()">Calculate</button>
-        <button class="btn" onclick="resetAll()">Reset</button>
-        <button class="btn" onclick="addSubject()">Add</button>
-      </div>
-    </div>
-
-    <!-- RIGHT CARD – RESULT -->
-    <div class="card result-card">
-      <div class="card-title">Result</div>
-
-      <!-- empty state -->
-      <div id="emptyMsg" class="result-empty">
-        Enter marks and press <strong>Calculate</strong>
-      </div>
-
-      <!-- result body -->
-      <div id="resBody" class="hidden" style="width:100%">
-        <div class="gpa-large" id="gpaVal">0.00</div>
-        <div class="gpa-sub">GPA out of 5.00</div>
-        <div class="grade-large" id="gradeVal">—</div>
-        <div class="verdict-badge" id="verdict">—</div>
-
-        <div class="stats-mini">
-          <div class="stat-mini"><b id="totalMarks">0</b><small>Total marks</small></div>
-          <div class="stat-mini"><b id="subCount">0</b><small>Subjects</small></div>
-          <div class="stat-mini"><b id="gpaNo4">—</b><small>Without 4th</small></div>
-          <div class="stat-mini"><b id="bestSub">—</b><small>Best subject</small></div>
-        </div>
-
-        <!-- scale inside result -->
-        <div class="scale-box">
-          <h4>Grading scale</h4>
-          <div class="scale-item"><span>80 to 100 percent</span><b>A+ (5.00)</b></div>
-          <div class="scale-item"><span>70 to 79 percent</span><b>A (4.00)</b></div>
-          <div class="scale-item"><span>60 to 69 percent</span><b>A- (3.50)</b></div>
-          <div class="scale-item"><span>50 to 59 percent</span><b>B (3.00)</b></div>
-          <div class="scale-item"><span>40 to 49 percent</span><b>C (2.25)</b></div>
-          <div class="scale-item"><span>33 to 39 percent</span><b>D (2.00)</b></div>
-          <div class="scale-item"><span>0 to 32 percent</span><b>F (0.00)</b></div>
-        </div>
-      </div>
-    </div>
+  <div class="opt-row">
+    <label>Group</label>
+    <select id="groupSelect" onchange="switchGroup(this.value)">
+      <option value="science">Science</option>
+      <option value="humanities">Humanities (Arts)</option>
+      <option value="business">Business Studies</option>
+    </select>
+    <label style="margin-left:.4rem">4th subject</label>
+    <select id="optSelect" onchange="optionalName=this.value; render(); calculate();"></select>
+    <label style="margin-left:.5rem">Auto-calc</label>
+    <input type="checkbox" id="autoCalc" checked style="accent-color:var(--accent); width:16px; height:16px; cursor:pointer" onchange="if(this.checked) calculate()">
   </div>
 
-  <!-- FOOTER with Telegram and Email -->
+  <table>
+    <thead>
+      <tr><th>Subject</th><th style="width:150px">Marks</th><th style="width:74px">Grade</th><th style="width:26px"></th></tr>
+    </thead>
+    <tbody id="subjectRows"></tbody>
+  </table>
+
+  <div class="actions">
+    <button class="btn btn-primary" onclick="calculate()">Calculate</button>
+    <button class="btn" onclick="resetAll()">Reset</button>
+    <button class="btn" onclick="addSubject()">+ Add subject</button>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div class="card result-card">
+  <div class="card-title">Result</div>
+
+  <div id="emptyMsg" class="result-empty">
+    Enter marks — results update <strong>live</strong> as you type.
+  </div>
+
+  <div id="resBody" class="hidden" style="width:100%">
+    <div class="gauge-wrap">
+      <div class="gauge">
+        <svg width="170" height="170" viewBox="0 0 170 170">
+          <circle class="track" cx="85" cy="85" r="72"></circle>
+          <circle class="arc" id="gaugeArc" cx="85" cy="85" r="72"
+            stroke-dasharray="452.4" stroke-dashoffset="452.4"></circle>
+        </svg>
+        <div class="gauge-center">
+          <div class="gpa-large" id="gpaVal">0.00</div>
+          <div class="gpa-sub">GPA / 5.00</div>
+        </div>
+      </div>
+      <div class="grade-large" id="gradeVal">—</div>
+      <div class="verdict-badge pass" id="verdict">—</div>
+    </div>
+
+    <div class="stats-mini">
+      <div class="stat-mini"><b id="totalMarks">0</b><small>Total marks</small></div>
+      <div class="stat-mini"><b id="avgPct">—</b><small>Average %</small></div>
+      <div class="stat-mini"><b id="gpaNo4">—</b><small>Without 4th</small></div>
+      <div class="stat-mini"><b id="bestSub">—</b><small>Best subject</small></div>
+    </div>
+
+    <div class="chart-box">
+      <h4>Subject performance</h4>
+      <div id="chartBody"></div>
+    </div>
+
+    <div class="scale-box">
+      <h4>Grading scale</h4>
+      <div class="scale-item"><span>80–100%</span><b>A+ (5.00)</b></div>
+      <div class="scale-item"><span>70–79%</span><b>A (4.00)</b></div>
+      <div class="scale-item"><span>60–69%</span><b>A- (3.50)</b></div>
+      <div class="scale-item"><span>50–59%</span><b>B (3.00)</b></div>
+      <div class="scale-item"><span>40–49%</span><b>C (2.25)</b></div>
+      <div class="scale-item"><span>33–39%</span><b>D (2.00)</b></div>
+      <div class="scale-item"><span>0–32%</span><b>F (0.00)</b></div>
+    </div>
+  </div>
+</div>
+
+  </div>
   <div class="foot-note">
-    Reference only, verify with your board. Bangla and English combined into one grade.
-    4th subject bonus: (point minus 2) divided by 2 added when above D.<br><br>
+    Reference only — verify with your board. Bangla & English papers are combined into one grade each,
+    but failing <b>either paper</b> (below 33) fails the whole subject.
+    4th subject bonus: (point − 2) ÷ 2 added when above D.<br><br>
     <span class="highlight">Join our Telegram group:</span>
     <a href="https://t.me/ctins_community" target="_blank" rel="noopener">t.me/ctins_community</a><br>
     <span class="highlight">Report issues by email:</span>
     <a href="mailto:critical.thinking.institution@gmail.com">critical.thinking.institution@gmail.com</a>
+  </div>
 </div>
-</div>
-
-<script>
-  // ---------- SUBJECT DATA ----------
-  const defaultSubjects = [
-    { name: "Bangla (1st+2nd)", parts: ["1st", "2nd"], max: [100, 100] },
-    { name: "English (1st+2nd)", parts: ["1st", "2nd"], max: [100, 100] },
-    { name: "Mathematics", parts: ["Marks"], max: [100] },
-    { name: "Physics", parts: ["Marks"], max: [100] },
-    { name: "Chemistry", parts: ["Marks"], max: [100] },
-    { name: "Biology", parts: ["Marks"], max: [100] },
-    { name: "Higher Math", parts: ["Marks"], max: [100] },
-    { name: "ICT", parts: ["Marks"], max: [50] },
-    { name: "Bangladesh and Global", parts: ["Marks"], max: [100] },
-    { name: "Islam and Moral Edu", parts: ["Marks"], max: [100] },
-    { name: "Physical Education", parts: ["Marks"], max: [50] },
-    { name: "Career and Life Skills", parts: ["Marks"], max: [50] },
-  ];
-
-  let subjects = JSON.parse(JSON.stringify(defaultSubjects));
-  let optionalName = "Higher Math";   // default 4th subject
-
-  const optionalIdx = () => subjects.findIndex(s => s.name === optionalName);
-
-  // ---------- GRADE FUNCTION ----------
-  function gradeInfo(pct) {
-    if (pct >= 80) return { g: "A+", p: 5.00, cls: "g5" };
-    if (pct >= 70) return { g: "A", p: 4.00, cls: "g4" };
-    if (pct >= 60) return { g: "A-", p: 3.50, cls: "g35" };
-    if (pct >= 50) return { g: "B", p: 3.00, cls: "g3" };
-    if (pct >= 40) return { g: "C", p: 2.25, cls: "g225" };
-    if (pct >= 33) return { g: "D", p: 2.00, cls: "g2" };
-    return { g: "F", p: 0.00, cls: "g0" };
-  }
-
-  // ---------- CLAMP INPUT TO MAX ----------
-  function clampInput(el, max) {
-    let val = parseFloat(el.value);
-    if (isNaN(val)) {
-      el.value = "";
-      return;
+  <div id="toast"></div>
+  <script>
+  const GROUPS = {
+    science: {
+      label: "Science",
+      optional: ["Higher Math","Biology","Agriculture Studies"],
+      subjects: [
+        { name:"Bangla (1st+2nd)", parts:["1st","2nd"], max:[100,100], fixed:true },
+        { name:"English (1st+2nd)", parts:["1st","2nd"], max:[100,100], fixed:true },
+        { name:"Mathematics", parts:["Marks"], max:[100], fixed:true },
+        { name:"Physics", parts:["Marks"], max:[100], fixed:true },
+        { name:"Chemistry", parts:["Marks"], max:[100], fixed:true },
+        { name:"Biology", parts:["Marks"], max:[100], fixed:true },
+        { name:"Higher Math", parts:["Marks"], max:[100], fixed:true },
+        { name:"ICT", parts:["Marks"], max:[50], fixed:true },
+        { name:"Bangladesh and Global", parts:["Marks"], max:[100], fixed:true },
+        { name:"Islam and Moral Edu", parts:["Marks"], max:[100], fixed:true },
+        { name:"Physical Education", parts:["Marks"], max:[50], fixed:true },
+        { name:"Career and Life Skills", parts:["Marks"], max:[50], fixed:true },
+      ]
+    },
+    humanities: {
+      label: "Humanities (Arts)",
+      optional: ["Geography and Environment","History and World Civilizations","Economics","Home Science"],
+      subjects: [
+        { name:"Bangla (1st+2nd)", parts:["1st","2nd"], max:[100,100], fixed:true },
+        { name:"English (1st+2nd)", parts:["1st","2nd"], max:[100,100], fixed:true },
+        { name:"Mathematics", parts:["Marks"], max:[100], fixed:true },
+        { name:"ICT", parts:["Marks"], max:[50], fixed:true },
+        { name:"Bangladesh and Global", parts:["Marks"], max:[100], fixed:true },
+        { name:"Islam and Moral Edu", parts:["Marks"], max:[100], fixed:true },
+        { name:"Geography and Environment", parts:["Marks"], max:[100], fixed:true },
+        { name:"History and World Civilizations", parts:["Marks"], max:[100], fixed:true },
+        { name:"Economics", parts:["Marks"], max:[100], fixed:true },
+        { name:"Physical Education", parts:["Marks"], max:[50], fixed:true },
+        { name:"Career and Life Skills", parts:["Marks"], max:[50], fixed:true },
+      ]
+    },
+    business: {
+      label: "Business Studies",
+      optional: ["Agriculture Studies","Higher Math","Economics"],
+      subjects: [
+        { name:"Bangla (1st+2nd)", parts:["1st","2nd"], max:[100,100], fixed:true },
+        { name:"English (1st+2nd)", parts:["1st","2nd"], max:[100,100], fixed:true },
+        { name:"Mathematics", parts:["Marks"], max:[100], fixed:true },
+        { name:"ICT", parts:["Marks"], max:[50], fixed:true },
+        { name:"Bangladesh and Global", parts:["Marks"], max:[100], fixed:true },
+        { name:"Islam and Moral Edu", parts:["Marks"], max:[100], fixed:true },
+        { name:"Accounting", parts:["Marks"], max:[100], fixed:true },
+        { name:"Business Entrepreneurship", parts:["Marks"], max:[100], fixed:true },
+        { name:"Finance and Banking", parts:["Marks"], max:[100], fixed:true },
+        { name:"Physical Education", parts:["Marks"], max:[50], fixed:true },
+        { name:"Career and Life Skills", parts:["Marks"], max:[50], fixed:true },
+      ]
     }
-    if (val < 0) el.value = 0;
-    else if (val > max) el.value = max;
+  };
+
+  let groupName = "science";
+  let subjects = JSON.parse(JSON.stringify(GROUPS.science.subjects));
+  let optionalName = "Higher Math";
+
+  const STORE_KEY = "sscGpaCalc_v2";
+
+  // ---------- GRADE ----------
+  function gradeInfo(pct){
+    if(pct>=80) return {g:"A+",p:5.00,cls:"g5",col:"#6ee7a0"};
+    if(pct>=70) return {g:"A",p:4.00,cls:"g4",col:"#7aa2ff"};
+    if(pct>=60) return {g:"A-",p:3.50,cls:"g35",col:"#b794ff"};
+    if(pct>=50) return {g:"B",p:3.00,cls:"g3",col:"#ffbe5c"};
+    if(pct>=40) return {g:"C",p:2.25,cls:"g225",col:"#ff9a6b"};
+    if(pct>=33) return {g:"D",p:2.00,cls:"g2",col:"#ff7b7b"};
+    return {g:"F",p:0.00,cls:"g0",col:"#ff5e5e"};
+  }
+  const GRADE_F = {g:"F",p:0.00,cls:"g0",col:"#ff5e5e"};
+
+  // ---------- HELPERS ----------
+  function clampInput(el,max){
+    let v = parseFloat(el.value);
+    if(isNaN(v)){ el.value=""; return; }
+    el.value = Math.min(Math.max(v,0),max);
+  }
+  function toast(msg){
+    const t=document.getElementById("toast");
+    t.textContent=msg; t.classList.add("show");
+    clearTimeout(t._tm); t._tm=setTimeout(()=>t.classList.remove("show"),2200);
   }
 
-  // ---------- RENDER SUBJECT ROWS ----------
-  function render() {
-    const tb = document.getElementById("subjectRows");
-    tb.innerHTML = "";
-
-    subjects.forEach((s, i) => {
-      const tr = document.createElement("tr");
-      const isOpt = (s.name === optionalName);
-      const optBadge = isOpt ? ' <span class="opt-tag">4TH</span>' : '';
-
-      let inputs = "";
-      s.parts.forEach((p, j) => {
-        inputs += `<input type="number" min="0" max="${s.max[j]}" placeholder="${s.max[j]}" id="m${i}_${j}"
-          oninput="clampInput(this, ${s.max[j]}); liveGrade(${i})">`;
+  // ---------- RENDER ----------
+  function render(){
+    const tb=document.getElementById("subjectRows");
+    tb.innerHTML="";
+    subjects.forEach((s,i)=>{
+      const tr=document.createElement("tr");
+      tr.className = s.fixed ? "" : "removable";
+      const isOpt = s.name===optionalName;
+      const optBadge = isOpt ? ' <span class="opt-tag">4TH</span>' : "";
+      const r0 = getSubjectPct(i);
+      const failBadge = (r0.pct!==null && (r0.partFail || r0.pct<33)) ? ' <span class="fail-tag">FAIL</span>' : "";
+      let inputs="";
+      s.parts.forEach((p,j)=>{
+        inputs+=`<input type="number" min="0" max="${s.max[j]}" placeholder="${s.max[j]}" id="m${i}_${j}"
+          value="${savedValue(i,j)}" oninput="clampInput(this,${s.max[j]}); onEdit(${i})">`;
       });
-
-      const totalMax = s.max.reduce((a, b) => a + b, 0);
-
-      tr.innerHTML = `
-        <td class="subject-name">${s.name}${optBadge}</td>
-        <td>
-          <div class="marks-wrap">
-            ${inputs}
-            <span class="max-tag">out of ${totalMax}</span>
-          </div>
+      const totalMax=s.max.reduce((a,b)=>a+b,0);
+      const delBtn = s.fixed ? "" : `<button class="del-btn" title="Remove" onclick="removeSubject(${i})">✕</button>`;
+      tr.innerHTML=`
+        <td class="subject-name">${s.name}${optBadge}${failBadge}
+          <div class="subj-bar"><i id="b${i}"></i></div>
         </td>
+        <td><div class="marks-wrap">${inputs}<span class="max-tag">/ ${totalMax}</span></div></td>
         <td><span class="grade-pill g3" id="g${i}">—</span></td>
-      `;
+        <td>${delBtn}</td>`;
       tb.appendChild(tr);
+      liveGrade(i);
     });
   }
 
-  // ---------- GET SUBJECT PERCENTAGE ----------
-  function getSubjectPct(i) {
-    const s = subjects[i];
-    let obtained = 0;
-    let max = 0;
-    let any = false;
-
-    s.parts.forEach((p, j) => {
-      const el = document.getElementById(`m${i}_${j}`);
-      if (!el) return;
-      const v = el.value;
-      if (v !== "") {
-        any = true;
-        let num = parseFloat(v) || 0;
-        if (num < 0) num = 0;
-        if (num > s.max[j]) num = s.max[j];
-        obtained += num;
-      }
-      max += s.max[j];
-    });
-
-    if (!any) return { pct: null, obtained, max, filled: false };
-    return { pct: (obtained / max) * 100, obtained, max, filled: true };
+  // ---------- GROUP SWITCH ----------
+  function syncOptSelect(){
+    const sel=document.getElementById("optSelect");
+    const opts=GROUPS[groupName].optional;
+    sel.innerHTML=opts.map(o=>`<option value="${o}">${o}</option>`).join("");
+    optionalName=opts[0];
+    sel.value=optionalName;
   }
 
-  // ---------- LIVE GRADE UPDATE ----------
-  function liveGrade(i) {
-    const pill = document.getElementById("g" + i);
-    const r = getSubjectPct(i);
-
-    if (r.pct === null) {
-      pill.textContent = "—";
-      pill.className = "grade-pill g3";
-      return;
-    }
-
-    const gi = gradeInfo(r.pct);
-    pill.textContent = `${gi.g} (${gi.p.toFixed(2)})`;
-    pill.className = `grade-pill ${gi.cls}`;
-  }
-
-  // ---------- CALCULATE ----------
-  function calculate() {
-    const oIdx = optionalIdx();
-    const isOpt = oIdx !== -1;
-
-    let total = 0;
-    let maxTotal = 0;
-    let count = 0;
-    let countNo4 = 0;
-    let sumNo4 = 0;
-    let bestPct = -1;
-    let bestName = "";
-    let fail = false;
-
-    const rows = [];
-
-    subjects.forEach((_, i) => {
-      const r = getSubjectPct(i);
-      if (!r.filled) return;
-
-      const gi = gradeInfo(r.pct);
-      rows.push({ i, pct: r.pct, p: gi.p });
-
-      total += r.obtained;
-      maxTotal += r.max;
-      count++;
-
-      if (r.pct > bestPct) {
-        bestPct = r.pct;
-        bestName = subjects[i].name;
-      }
-      if (gi.g === "F") fail = true;
-    });
-
-    if (count === 0) {
-      alert("Please enter marks for at least one subject.");
-      return;
-    }
-
-    // GPA calculation with 4th subject bonus
-    let sum = 0;
-    rows.forEach(r => {
-      if (isOpt && r.i === oIdx) {
-        if (r.p > 2.00) sum += (r.p - 2) / 2;
-      } else {
-        sum += r.p;
-        sumNo4 += r.p;
-        countNo4++;
-      }
-    });
-
-    const fourthFilled = isOpt && rows.some(r => r.i === oIdx);
-    const n = fourthFilled ? count - 1 : count;
-
-    const gpa = fail ? 0 : Math.min(5.00, sum / n);
-    const gpaNo4 = countNo4 ? Math.min(5.00, sumNo4 / countNo4) : NaN;
-
-    const overall = gradeInfo(fail ? 0 : gpa * 20);
-
-    // ----- update UI -----
-    document.getElementById("emptyMsg").classList.add("hidden");
-    document.getElementById("resBody").classList.remove("hidden");
-
-    document.getElementById("gpaVal").textContent = gpa.toFixed(2);
-    document.getElementById("gradeVal").textContent = fail ? "F" : overall.g;
-    document.getElementById("totalMarks").textContent = total + " / " + maxTotal;
-    document.getElementById("subCount").textContent = count;
-    document.getElementById("gpaNo4").textContent = isNaN(gpaNo4) ? "—" : gpaNo4.toFixed(2);
-
-    const bestShort = bestName.split("(")[0].trim();
-    document.getElementById("bestSub").textContent = `${bestShort} (${bestPct.toFixed(0)}%)`;
-
-    // verdict
-    const vd = document.getElementById("verdict");
-    vd.style.background = "#0d2318";
-    vd.style.color = "#6ee7a0";
-    vd.style.borderColor = "#1b3d2a";
-
-    if (fail) {
-      vd.textContent = "Failed (F present)";
-      vd.style.background = "#241010";
-      vd.style.color = "#ff7b7b";
-      vd.style.borderColor = "#3d1a1a";
-    } else if (gpa >= 5.00) {
-      vd.textContent = "Golden GPA perfect";
-    } else if (gpa >= 4.00) {
-      vd.textContent = "Excellent result";
-    } else if (gpa >= 3.00) {
-      vd.textContent = "Good result";
-    } else {
-      vd.textContent = "Keep pushing";
-      vd.style.background = "#241a0a";
-      vd.style.color = "#ffbe5c";
-      vd.style.borderColor = "#3d2e12";
-    }
-
-    if (window.innerWidth < 780) {
-      document.getElementById("resBody").scrollIntoView({ behavior: "smooth", block: "nearest" });
-    }
-  }
-
-  // ---------- RESET ----------
-  function resetAll() {
-    subjects = JSON.parse(JSON.stringify(defaultSubjects));
-    optionalName = "Higher Math";
-    document.getElementById("optSelect").value = "Higher Math";
+  function switchGroup(g){
+    groupName=g;
+    subjects=JSON.parse(JSON.stringify(GROUPS[g].subjects));
+    marks={};
+    syncOptSelect();
+    try{ localStorage.setItem(STORE_KEY+"_group", g); }catch(e){}
     render();
     document.getElementById("resBody").classList.add("hidden");
     document.getElementById("emptyMsg").classList.remove("hidden");
+    toast(GROUPS[g].label+" group loaded");
+  }
+  function savedValue(i,j){ return (marks[i]&&marks[i][j]!==undefined) ? marks[i][j] : ""; }
+  function onEdit(i){ liveGrade(i); saveMarks(); if(autoOn()) calculate(); }
+  function autoOn(){ return document.getElementById("autoCalc").checked; }
+
+  // ---------- STATE PERSISTENCE ----------
+  let marks = {};
+  function saveMarks(){
+    marks={};
+    subjects.forEach((s,i)=>{
+      s.parts.forEach((p,j)=>{
+        const el=document.getElementById(`m${i}_${j}`);
+        if(el && el.value!==""){ (marks[i]=marks[i]||{})[j]=el.value; }
+      });
+    });
+    try{ localStorage.setItem(STORE_KEY, JSON.stringify({marks,optionalName,groupName,custom:subjects.filter(s=>!s.fixed)})); }catch(e){}
+  }
+  function restore(){
+    try{
+      const d=JSON.parse(localStorage.getItem(STORE_KEY)||"null");
+      const savedGroup=(function(){ try{ return localStorage.getItem(STORE_KEY+"_group")||"science"; }catch(e){ return "science"; } })();
+      if(savedGroup && GROUPS[savedGroup]){
+        groupName=savedGroup;
+        subjects=JSON.parse(JSON.stringify(GROUPS[savedGroup].subjects));
+        document.getElementById("groupSelect").value=groupName;
+      }
+      if(!d){
+        syncOptSelect();
+        return false;
+      }
+      marks=d.marks||{};
+      optionalName=d.optionalName||GROUPS[groupName].optional[0];
+      const gOpts=GROUPS[groupName].optional;
+      if(!gOpts.includes(optionalName)) optionalName=gOpts[0];
+      (d.custom||[]).forEach(c=>subjects.push(c));
+      document.getElementById("optSelect").value=optionalName;
+      return true;
+    }catch(e){ syncOptSelect(); return false; }
   }
 
-  // ---------- ADD SUBJECT ----------
-  function addSubject() {
-    const name = prompt("Subject name:", "Extra subject");
-    if (!name || !name.trim()) return;
-    const mk = prompt("Full marks?", "100");
-    const max = Math.max(1, parseInt(mk) || 100);
-    subjects.push({ name: name.trim(), parts: ["Marks"], max: [max] });
+  // ---------- PCT ----------
+  function getSubjectPct(i){
+    const s=subjects[i]; let obtained=0,max=0,any=false,partFail=false;
+    s.parts.forEach((p,j)=>{
+      const el=document.getElementById(`m${i}_${j}`);
+      if(!el) return;
+      if(el.value!==""){
+        any=true;
+        let n=parseFloat(el.value)||0;
+        n=Math.min(Math.max(n,0),s.max[j]);
+        obtained+=n;
+        // each paper must pass on its own (e.g. Bangla 1st/2nd, English 1st/2nd)
+        if((n/s.max[j])*100 < 33) partFail=true;
+      }
+      max+=s.max[j];
+    });
+    return any ? {pct:(obtained/max)*100, obtained, max, filled:true, partFail}
+               : {pct:null, obtained, max, filled:false, partFail:false};
+  }
+
+  function liveGrade(i){
+    const pill=document.getElementById("g"+i);
+    const bar=document.getElementById("b"+i);
+    const r=getSubjectPct(i);
+    if(r.pct===null){ pill.textContent="—"; pill.className="grade-pill g3"; if(bar) bar.style.width="0%"; return; }
+    const gi = r.partFail ? GRADE_F : gradeInfo(r.pct);
+    pill.textContent=`${gi.g} (${gi.p.toFixed(2)})`;
+    pill.className=`grade-pill ${gi.cls}`;
+    if(bar){ bar.style.width=Math.min(100,r.pct)+"%"; bar.style.background=gi.col; }
+  }
+
+  // ---------- CALCULATE ----------
+  let lastResult=null;
+  function calculate(){
+    const oIdx=subjects.findIndex(s=>s.name===optionalName);
+    const isOpt=oIdx!==-1;
+    let total=0,maxTotal=0,count=0,countNo4=0,sumNo4=0,bestPct=-1,bestName="",fail=false,failList=[];
+    const rows=[];
+
+    subjects.forEach((_,i)=>{
+      const r=getSubjectPct(i);
+      if(!r.filled) return;
+      // failing any single paper fails the whole subject
+      const gi = r.partFail ? GRADE_F : gradeInfo(r.pct);
+      rows.push({i,pct:r.pct,p:gi.p,gi});
+      total+=r.obtained; maxTotal+=r.max; count++;
+      if(r.pct>bestPct){ bestPct=r.pct; bestName=subjects[i].name; }
+      // Failing counts only for compulsory subjects — the 4th (optional) subject is excluded
+      if(isOpt && i===oIdx) return;
+      if(gi.g==="F"){ fail=true; failList.push(subjects[i].name); }
+    });
+
+    if(count===0){
+      document.getElementById("resBody").classList.add("hidden");
+      document.getElementById("emptyMsg").classList.remove("hidden");
+      return;
+    }
+
+    let sum=0;
+    rows.forEach(r=>{
+      if(isOpt && r.i===oIdx){ if(r.p>2.00) sum+=(r.p-2)/2; }
+      else{ sum+=r.p; sumNo4+=r.p; countNo4++; }
+    });
+
+    const fourthFilled = isOpt && rows.some(r=>r.i===oIdx);
+    const n = fourthFilled ? count-1 : count;
+    const gpa = fail ? 0 : Math.min(5.00, sum/n);
+    const gpaNo4 = countNo4 ? Math.min(5.00,sumNo4/countNo4) : NaN;
+    const avgPct = maxTotal ? (total/maxTotal)*100 : 0;
+
+    lastResult = {gpa, fail, rows, total, maxTotal, count, failList, bestName, bestPct};
+
+    // UI
+    document.getElementById("emptyMsg").classList.add("hidden");
+    document.getElementById("resBody").classList.remove("hidden");
+
+    const gv=document.getElementById("gpaVal");
+    animateNumber(gv, parseFloat(gv.textContent)||0, gpa, 600, v=>v.toFixed(2));
+    document.getElementById("gradeVal").textContent = fail ? "F" : gradeInfo(gpa*20).g;
+
+    // gauge
+    const C=452.4;
+    const arc=document.getElementById("gaugeArc");
+    arc.style.strokeDashoffset = C - (C*(gpa/5));
+    arc.style.stroke = fail ? "#ff5e5e" : gradeInfo(gpa*20).col;
+
+    document.getElementById("totalMarks").textContent = total+" / "+maxTotal;
+    document.getElementById("avgPct").textContent = avgPct.toFixed(1)+"%";
+    document.getElementById("gpaNo4").textContent = isNaN(gpaNo4) ? "—" : gpaNo4.toFixed(2);
+    document.getElementById("bestSub").textContent = bestName.split("(")[0].trim()+" ("+bestPct.toFixed(0)+"%)";
+
+    // verdict
+    const vd=document.getElementById("verdict");
+    vd.className="verdict-badge pass";
+    if(fail){ vd.textContent="Failed — "+failList[0]+(failList.length>1?` +${failList.length-1}`:""); vd.className="verdict-badge fail"; }
+    else if(gpa>=5.00){ vd.textContent="Golden GPA-5 🏆"; }
+    else if(gpa>=4.00){ vd.textContent="Excellent result"; }
+    else if(gpa>=3.00){ vd.textContent="Good result"; }
+    else { vd.textContent="Keep pushing"; vd.className="verdict-badge mid"; }
+
+    renderChart(rows);
+
+    if(window.innerWidth<820){
+      document.getElementById("resBody").scrollIntoView({behavior:"smooth",block:"nearest"});
+    }
+  }
+
+  function animateNumber(el,from,to,dur,fmt){
+    const t0=performance.now();
+    function step(t){
+      const k=Math.min(1,(t-t0)/dur);
+      const e=1-Math.pow(1-k,3);
+      el.textContent=fmt(from+(to-from)*e);
+      if(k<1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  function renderChart(rows){
+    const cb=document.getElementById("chartBody");
+    cb.innerHTML="";
+    const sorted=[...rows].sort((a,b)=>b.pct-a.pct);
+    sorted.forEach(r=>{
+      const name=subjects[r.i].name.split("(")[0].trim();
+      const div=document.createElement("div");
+      div.className="chart-row";
+      div.innerHTML=`<span class="cname">${name}</span>
+        <span class="cbar"><i style="width:0%;background:${r.gi.col}"></i></span>
+        <span class="cval">${r.pct.toFixed(0)}%</span>`;
+      cb.appendChild(div);
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{
+        const bar=div.querySelector(".cbar i");
+        bar.style.width=Math.min(100,r.pct)+"%";
+      }));
+    });
+  }
+
+  // ---------- ACTIONS ----------
+  function resetAll(){
+    subjects=JSON.parse(JSON.stringify(GROUPS[groupName].subjects));
+    marks={};
+    syncOptSelect();
+    try{ localStorage.removeItem(STORE_KEY); }catch(e){}
     render();
+    document.getElementById("resBody").classList.add("hidden");
+    document.getElementById("emptyMsg").classList.remove("hidden");
+    toast("Reset done");
+  }
+
+  function addSubject(){
+    const name=prompt("Subject name:","Extra subject");
+    if(!name||!name.trim()) return;
+    const mk=prompt("Full marks?","100");
+    const max=Math.max(1,parseInt(mk)||100);
+    subjects.push({name:name.trim(),parts:["Marks"],max:[max],fixed:false});
+    render();
+    if(autoOn()) calculate();
+    toast("Subject added");
+  }
+
+  function removeSubject(i){
+    subjects.splice(i,1);
+    marks={};
+    saveMarks();
+    render();
+    if(autoOn()) calculate();
+    toast("Subject removed");
+  }
+
+  function fillSample(){
+    marks={};
+    subjects.forEach((s,i)=>{
+      marks[i]={};
+      // deterministic varied sample: strong start, a few dips
+      const profile=[0.85,0.77,0.72,0.88,0.66,0.74,0.81,0.84,0.58,0.76,0.90,0.45];
+      const pct=profile[i%profile.length];
+      s.max.forEach((m,j)=>marks[i][j]=Math.round(m*pct));
+    });
+    render();
+    calculate();
+    toast("Sample marks loaded");
+  }
+
+  function fillAllAplus(){
+    marks={};
+    subjects.forEach((s,i)=>{
+      marks[i]={};
+      s.max.forEach((m,j)=>marks[i][j]=Math.round(m*0.85));
+    });
+    render();
+    calculate();
+    toast("Filled with A+ range marks (85%)");
+  }
+
+  function copyResult(){
+    if(!lastResult){ toast("Calculate first"); return; }
+    const r=lastResult;
+    const lines=[
+      "SSC GPA Result",
+      "GPA: "+r.gpa.toFixed(2)+" / 5.00",
+      "Total marks: "+r.total+" / "+r.maxTotal,
+      "Subjects: "+r.count,
+      r.fail?("Failed: "+r.failList.join(", ")):"Best: "+r.bestName+" ("+r.bestPct.toFixed(0)+"%)",
+    ];
+    const txt=lines.join("\n");
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(()=>toast("Result copied"),()=>toast("Copy failed"));
+    }else{ toast("Clipboard not available"); }
+  }
+
+  function printResult(){ if(!lastResult){ toast("Calculate first"); return; } window.print(); }
+
+  function toggleTheme(){
+    document.body.classList.toggle("light");
+    const light=document.body.classList.contains("light");
+    document.getElementById("themeToggle").textContent = light ? "☀️ Theme" : "🌙 Theme";
+    try{ localStorage.setItem(STORE_KEY+"_light", light?"1":"0"); }catch(e){}
   }
 
   // ---------- INIT ----------
-  render();
+  (function init(){
+    try{
+      if(localStorage.getItem(STORE_KEY+"_light")==="1"){
+        document.body.classList.add("light");
+        document.getElementById("themeToggle").textContent="☀️ Theme";
+      }
+    }catch(e){}
+    restore();
+    render();
+    const anyFilled = subjects.some((_,i)=>getSubjectPct(i).filled);
+    if(anyFilled) calculate();
+  })();
 </script>
 </body>
 </html>
